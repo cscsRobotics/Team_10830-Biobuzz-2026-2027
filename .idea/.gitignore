@@ -1,0 +1,31 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Built application files
+*.apk
+*.aar
+*.bundle
+*.apk.ids
+
+# Files for the JVM target
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+build/
+
+# Gradle files
+.gradle/
+build/
+
+# Local configuration file (sdk path, etc.)
+local.properties
+
+# IntelliJ project files
+.idea/
+*.iml
+*.hprof
+.cxx/
+.vs/
