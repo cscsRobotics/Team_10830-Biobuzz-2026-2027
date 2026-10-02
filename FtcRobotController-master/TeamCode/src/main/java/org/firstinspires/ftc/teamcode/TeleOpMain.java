@@ -237,15 +237,15 @@ public class TeleOpMain extends LinearOpMode {
     backRightDrive = hardwareMap.get(DcMotor.class,"BRMoto"); //Was FR
     
     // map motors for ball intake and ball sorter
-    intakeMoto = hardwareMap.get(DcMotor.class,"intake");
-    sorterMoto = hardwareMap.get(DcMotor.class,"Sorter");
+    //intakeMoto = hardwareMap.get(DcMotor.class,"intake");
+    //sorterMoto = hardwareMap.get(DcMotor.class,"Sorter");
     
     // map fly wheels motors
-    flyWheelRightMoto = hardwareMap.get(DcMotorEx.class,"flyWheelRight");
-    flyWheelLeftMoto = hardwareMap.get(DcMotorEx.class,"flyWheelLeft");
+    //flyWheelRightMoto = hardwareMap.get(DcMotorEx.class,"flyWheelRight");
+      //flyWheelLeftMoto = hardwareMap.get(DcMotorEx.class,"flyWheelLeft");
     
-    color = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
-    color.setGain(3);  // increase sensitivity of the color sensor
+    //color = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
+    //color.setGain(3);  // increase sensitivity of the color sensor
     
     // velocityController = new PIDFController (
     //    new P(0.1), // P gain
@@ -258,15 +258,15 @@ public class TeleOpMain extends LinearOpMode {
     // volocityController.setTargetVelocity(targetVelocity);
 
       // map ALL servos
-    lift = hardwareMap.servo.get("lift");
-    pushBallFront = hardwareMap.servo.get("pushBall");
-    pushBallBack = hardwareMap
-            .servo.get("pushballback");
-    flipper = hardwareMap.servo.get("flipper");
+    //lift = hardwareMap.servo.get("lift");
+    //pushBallFront = hardwareMap.servo.get("pushBall");
+    //pushBallBack = hardwareMap
+      //      .servo.get("pushballback");
+    //flipper = hardwareMap.servo.get("flipper");
     
     // Blinkin - map LED lights
-    blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkinLed");
-    blinkinLedDriver.setPattern(BasePattern);
+    //blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkinLed");
+    //blinkinLedDriver.setPattern(BasePattern);
 
     // map and intiialize IMU on control hub for field relative driving.
         imu = hardwareMap.get(IMU.class, "imu");
@@ -284,8 +284,8 @@ public class TeleOpMain extends LinearOpMode {
       imu.initialize(new IMU.Parameters(RevOrientation));
         
     // Map LimeLight
-    limeLight = hardwareMap.get(Limelight3A.class, "limelight");
-    limeLight.pipelineSwitch(pipeLineGoalTags); // need to setup pipeline for april tags
+    //limeLight = hardwareMap.get(Limelight3A.class, "limelight");
+    //limeLight.pipelineSwitch(pipeLineGoalTags); // need to setup pipeline for april tags
     
    
 
@@ -316,31 +316,31 @@ public class TeleOpMain extends LinearOpMode {
     backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     
-    intakeMoto.setDirection(DcMotorSimple.Direction.REVERSE);
-    intakeMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    intakeMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    //intakeMoto.setDirection(DcMotorSimple.Direction.REVERSE);
+    //intakeMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    //intakeMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-    sorterMoto.setDirection(DcMotorSimple.Direction.FORWARD);     
+    //sorterMoto.setDirection(DcMotorSimple.Direction.FORWARD);
     //sorterMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    sorterMoto.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    //sorterMoto.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     //sorterMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     //sorterMoto.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     //sorterMoto.setTargetPosition(0);
 
-    flyWheelRightMoto.setDirection(DcMotorSimple.Direction.FORWARD);
-    flyWheelRightMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    flyWheelRightMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    //flyWheelRightMoto.setDirection(DcMotorSimple.Direction.FORWARD);
+    //flyWheelRightMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    //flyWheelRightMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-    flyWheelLeftMoto.setDirection(DcMotorSimple.Direction.REVERSE);
-    flyWheelLeftMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    flyWheelLeftMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    //flyWheelLeftMoto.setDirection(DcMotorSimple.Direction.REVERSE);
+    //flyWheelLeftMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    //flyWheelLeftMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     // Initialize the start positions and direction for servos
     //lift.setDirection(Servo.Direction.REVERSE);
-    lift.setPosition(liftDownPosition);
-    pushBallFront.setPosition(pushBallFDownPos);
-    pushBallBack.setPosition(pushBallBDownPos);
-    flipper.setPosition(flipPositionInit);
+    //lift.setPosition(liftDownPosition);
+    //pushBallFront.setPosition(pushBallFDownPos);
+    //pushBallBack.setPosition(pushBallBDownPos);
+    //flipper.setPosition(flipPositionInit);
     
 
     
@@ -349,7 +349,7 @@ public class TeleOpMain extends LinearOpMode {
      * The limeLight will drain the battery so since this is teleop, we can start the limeLight and 
      * don't need to wait for the start button to be pressed.
     */
-    limeLight.start();
+    //limeLight.start();
 
     telemetry.addData(">", "Robot Ready.  Press Play.");
     telemetry.update();
@@ -369,7 +369,7 @@ public class TeleOpMain extends LinearOpMode {
     {
 
       
-        NormalizedRGBA ballColor = color.getNormalizedColors();
+        /* NormalizedRGBA ballColor = color.getNormalizedColors();
         
         float normRed, normGreen, normBlue;
 
@@ -457,7 +457,7 @@ public class TeleOpMain extends LinearOpMode {
 
        } 
        
-      
+      */
       //
       // code to toogle the on and off of the fly wheels using the "b" button on game pad 1
       // 
@@ -514,39 +514,39 @@ public class TeleOpMain extends LinearOpMode {
           }
 
           // turn on fly wheels           telemetry.clearAll();
-          flyWheelRightMoto.setPower(wheelPower);
-          flyWheelLeftMoto.setPower(wheelPower); 
+          //flyWheelRightMoto.setPower(wheelPower);
+          //flyWheelLeftMoto.setPower(wheelPower);
       }
       else {
-          flyWheelRightMoto.setPower(0.0);
-          flyWheelLeftMoto.setPower(0.0);
+          //flyWheelRightMoto.setPower(0.0);
+          //flyWheelLeftMoto.setPower(0.0);
       }
        
       // Sort ball clockwise 
       if(gamepad1.y){
-         sorterMoto.setPower(sorterPowerSpeed);
+         //sorterMoto.setPower(sorterPowerSpeed);
          
           // delay request amout of time;
           sleep(rotateSorterRotateDelay);
 
           // stop sorter motor
-          sorterMoto.setPower(sorterPowerSpeedStop);
+         // sorterMoto.setPower(sorterPowerSpeedStop);
 
       }
 
       // Sort ball counter clockwise 
       if(gamepad1.x){
-         sorterMoto.setPower(-sorterPowerSpeed);
+        // sorterMoto.setPower(-sorterPowerSpeed);
          
          //delay request amout of time;
           sleep(rotateSorterRotateDelay);
 
          // stop sorter motor
-          sorterMoto.setPower(sorterPowerSpeedStop); 
+          //sorterMoto.setPower(sorterPowerSpeedStop);
           
           
           
-          sorterMoto.setPower(0);
+          //sorterMoto.setPower(0);
       }
 
     //Movement
