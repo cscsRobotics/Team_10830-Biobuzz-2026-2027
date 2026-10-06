@@ -269,17 +269,18 @@ public class TeleOpMain extends LinearOpMode {
     //blinkinLedDriver.setPattern(BasePattern);
 
     // map and intiialize IMU on control hub for field relative driving.
-        imu = hardwareMap.get(IMU.class, "imu");
-        
-        // This needs to be changed to match the orientation on your robot
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.DOWN;
-        RevHubOrientationOnRobot.UsbFacingDirection usbDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
+      imu = hardwareMap.get(IMU.class, "imu");
+
+// Match these directions to the physical orientation of the Control Hub.
+      RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
+              RevHubOrientationOnRobot.LogoFacingDirection.DOWN;
+
+      RevHubOrientationOnRobot.UsbFacingDirection usbDirection =
+              RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
 
       RevHubOrientationOnRobot RevOrientation = new RevHubOrientationOnRobot(
-              RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
-              RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD);
+              logoDirection,
+              usbDirection);
 
       imu.initialize(new IMU.Parameters(RevOrientation));
         
