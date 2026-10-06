@@ -310,6 +310,8 @@ public class TeleOpMain extends LinearOpMode {
 
 
     backLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+    backLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
     backRightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -570,10 +572,11 @@ public class TeleOpMain extends LinearOpMode {
 // GamePad 1 Usage
 //
 //  Axis
-//   left_stick_x = not used
-//   left_stick_y = rotate
-//   right_stick_x = strafe drive
-//   right_stick_y = forward drive
+
+//   left_stick_x  = strafe drive
+//   left_stick_y  = forward/back drive
+//   right_stick_x = rotate
+//   right_stick_y = not used
 //
 //  Buttons
 //    a = lift ball and shootzzz
