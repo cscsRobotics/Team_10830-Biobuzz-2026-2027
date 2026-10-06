@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class FieldOrientatedDrive {
     private DcMotor frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor;
     private IMU imu;
+
     public void init(HardwareMap haMap) {
         frontLeftMotor = haMap.get(DcMotor.class, "front_left_motor");
         backLeftMotor = haMap.get(DcMotor.class, "back_left_motor");
@@ -56,16 +57,17 @@ public class FieldOrientatedDrive {
         backRightMotor.setPower(maxSpeed * (backRightPower / maxPower));
     }
 
-    public void driveFieldRelative(double forward, double strafe, double rotate) {
-        double theta = Math.atan2(forward, strafe);
-        double r = Math.hypot(strafe, forward);
+    void driveFieldRelative(double forward, double strafe, double rotate) {
 
-        theta = AngleUnit.normalizeRadians(theta -
-                imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
+        double botHeading = imu.getRobotYawPitchRollAngles()
+                .getYaw(AngleUnit.RADIANS);
 
-        double newForward = r * Math.sin(theta);
-        double newStrafe = r * Math.cos(theta);
+        double rotX = strafe * Math.cos(-botHeading)
+                - forward * Math.sin(-botHeading);
 
-        this.drive(newForward, newStrafe, rotate);
+        double rotY = strafe * Math.sin(-botHeading)
+                + forward * Math.cos(-botHeading);
+
+        drive(rotY, rotX, rotate);
     }
 }
