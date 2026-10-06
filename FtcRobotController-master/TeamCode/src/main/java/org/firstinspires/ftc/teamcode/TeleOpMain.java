@@ -479,9 +479,9 @@ public class TeleOpMain extends LinearOpMode {
       // control the motor based on the toggle state
       if(motorOn){
              
-          LLResult lastResult = limeLight.getLatestResult();
+          //LLResult lastResult = limeLight.getLatestResult();
           
-          if (lastResult != null && lastResult.isValid()) {
+          /* if (lastResult != null && lastResult.isValid()) {
                           
              double targetArea = lastResult.getTa();
        
@@ -507,11 +507,11 @@ public class TeleOpMain extends LinearOpMode {
              
              telemetry.addData("Target Area", targetArea );
              telemetry.addData("Wheel Speed", wheelPower );
-             telemetry.update();
+            telemetry.update();
           }
           else{
             wheelPower = .85;
-          }
+          } */
 
           // turn on fly wheels           telemetry.clearAll();
           //flyWheelRightMoto.setPower(wheelPower);
