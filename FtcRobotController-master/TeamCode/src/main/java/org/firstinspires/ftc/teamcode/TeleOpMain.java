@@ -273,13 +273,13 @@ public class TeleOpMain extends LinearOpMode {
         
         // This needs to be changed to match the orientation on your robot
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
+                RevHubOrientationOnRobot.LogoFacingDirection.DOWN;
         RevHubOrientationOnRobot.UsbFacingDirection usbDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.UP;
+                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
 
       RevHubOrientationOnRobot RevOrientation = new RevHubOrientationOnRobot(
-              RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-              RevHubOrientationOnRobot.UsbFacingDirection.UP);
+              RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
+              RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD);
 
       imu.initialize(new IMU.Parameters(RevOrientation));
         
@@ -551,7 +551,11 @@ public class TeleOpMain extends LinearOpMode {
 
     //Movement
 
-        driveFieldRelative(gamepad1.left_stick_x, gamepad1.right_stick_y, gamepad1.left_stick_x);
+        driveFieldRelative(
+                -gamepad1.left_stick_y,
+                gamepad1.left_stick_x,
+                gamepad1.right_stick_x
+        );
 
 
 
