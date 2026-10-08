@@ -554,11 +554,11 @@ public class TeleOpMain extends LinearOpMode {
 
     //Movement
 
-        driveFieldRelative(
-                -gamepad1.left_stick_y,
-                gamepad1.left_stick_x,
-                gamepad1.right_stick_x
-        );
+      driveFieldRelative(
+              -gamepad1.left_stick_y, //forward/back
+              gamepad1.left_stick_x,   //strafe
+              gamepad1.right_stick_x   // rotate
+      );
 
 
 

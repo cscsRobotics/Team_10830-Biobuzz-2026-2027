@@ -13,10 +13,7 @@ public class FieldOrientatedDriveOpmode extends OpMode{
     }
 
     @Override
-    public void loop() {
-        //forward = gamepad1.left_stick_y;
-        //strafe = gamepad1.left_stick_x;
-        //rotate = gamepad1.left_stick_x;
+    public void loop() { 
 
         forward = -gamepad1.left_stick_y;
         strafe = gamepad1.left_stick_x;
