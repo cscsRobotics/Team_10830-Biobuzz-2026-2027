@@ -14,10 +14,10 @@ public class FieldOrientatedDrive {
     private IMU imu;
 
     public void init(HardwareMap haMap) {
-        frontLeftMotor = haMap.get(DcMotor.class, "front_left_motor");
-        backLeftMotor = haMap.get(DcMotor.class, "back_left_motor");
-        frontRightMotor = haMap.get(DcMotor.class, "front_right_motor");
-        backRightMotor = haMap.get(DcMotor.class, "back_right_motor");
+        frontLeftMotor = haMap.get(DcMotor.class, "FLMoto");
+        backLeftMotor = haMap.get(DcMotor.class, "BLMoto");
+        frontRightMotor = haMap.get(DcMotor.class, "FRMoto");
+        backRightMotor = haMap.get(DcMotor.class, "BRMoto");
 
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotor.Direction.REVERSE);

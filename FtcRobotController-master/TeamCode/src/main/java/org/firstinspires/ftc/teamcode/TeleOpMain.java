@@ -65,6 +65,8 @@ import java.util.List;
 @TeleOp(name = "TeleOpMain (Blocks to Java)", group = "Drive")
 public class TeleOpMain extends LinearOpMode {
 
+  FieldOrientatedDrive drive = new FieldOrientatedDrive();
+
   // Drive Wheels
   // Create Drive Wheel motors
   private DcMotor frontLeftDrive;
@@ -218,7 +220,9 @@ public class TeleOpMain extends LinearOpMode {
    */
   @Override
   public void runOpMode() {
-    
+
+    drive.init(hardwareMap);
+
     // Variables to toggle the on/off of the fly wheel motors
     boolean motorOn = false;
     boolean lastMotorState = false;
@@ -371,7 +375,11 @@ public class TeleOpMain extends LinearOpMode {
     while (opModeIsActive()) 
     {
 
-      
+      double forward = -gamepad1.left_stick_y;
+      double strafe = gamepad1.left_stick_x;
+      double rotate = gamepad1.right_stick_x;
+
+      drive.driveFieldRelative(forward, strafe, rotate);
         /* NormalizedRGBA ballColor = color.getNormalizedColors();
         
         float normRed, normGreen, normBlue;
@@ -554,15 +562,15 @@ public class TeleOpMain extends LinearOpMode {
 
     //Movement
 
-      driveFieldRelative(
+      /* driveFieldRelative(
               -gamepad1.left_stick_y, //forward/back
               gamepad1.left_stick_x,   //strafe
               gamepad1.right_stick_x   // rotate
       );
 
+      drive.driveFieldRelative(forward, strafe, rotate);
 
-
-        
+        */
     }
     
   }
