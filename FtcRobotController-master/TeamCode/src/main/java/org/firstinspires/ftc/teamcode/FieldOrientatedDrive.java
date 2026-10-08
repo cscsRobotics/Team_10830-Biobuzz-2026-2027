@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -10,24 +9,42 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class FieldOrientatedDrive {
-    private DcMotor frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor;
+    private DcMotor frontLeftDrive;
+    private DcMotor frontRightDrive;
+    private DcMotor backLeftDrive;
+    private DcMotor backRightDrive;
     private IMU imu;
 
-    public void init(HardwareMap haMap) {
-        frontLeftMotor = haMap.get(DcMotor.class, "FLMoto");
-        backLeftMotor = haMap.get(DcMotor.class, "BLMoto");
-        frontRightMotor = haMap.get(DcMotor.class, "FRMoto");
-        backRightMotor = haMap.get(DcMotor.class, "BRMoto");
+    public void init(HardwareMap hardwareMap) {
+        frontLeftDrive = hardwareMap.get(DcMotor.class, "FLMoto");
+        backLeftDrive = hardwareMap.get(DcMotor.class, "BLMoto");
+        frontRightDrive = hardwareMap.get(DcMotor.class, "FRMoto");
+        backRightDrive = hardwareMap.get(DcMotor.class, "BRMoto");
 
-        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        frontLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        imu = haMap.get(IMU.class, "imu");
+        frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        frontRightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        frontRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
+        backLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        backRightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        backRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        imu = hardwareMap.get(IMU.class, "imu");
 
         RevHubOrientationOnRobot RevOrientation = new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
@@ -51,13 +68,13 @@ public class FieldOrientatedDrive {
         maxPower = Math.max(maxPower, Math.abs(frontRightPower));
         maxPower = Math.max(maxPower, Math.abs(backRightPower));
 
-        frontLeftMotor.setPower(maxSpeed * (frontLeftPower / maxPower));
-        backLeftMotor.setPower(maxSpeed * (backLeftPower / maxPower));
-        frontRightMotor.setPower(maxSpeed * (frontRightPower / maxPower));
-        backRightMotor.setPower(maxSpeed * (backRightPower / maxPower));
+        frontLeftDrive.setPower(maxSpeed * (frontLeftPower / maxPower));
+        backLeftDrive.setPower(maxSpeed * (backLeftPower / maxPower));
+        frontRightDrive.setPower(maxSpeed * (frontRightPower / maxPower));
+        backRightDrive.setPower(maxSpeed * (backRightPower / maxPower));
     }
 
-    void driveFieldRelative(double forward, double strafe, double rotate) {
+    public void driveFieldRelative(double forward, double strafe, double rotate) {
 
         double botHeading = imu.getRobotYawPitchRollAngles()
                 .getYaw(AngleUnit.RADIANS);

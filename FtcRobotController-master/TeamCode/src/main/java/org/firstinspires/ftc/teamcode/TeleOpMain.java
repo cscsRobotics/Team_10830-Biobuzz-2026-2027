@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -69,66 +67,59 @@ public class TeleOpMain extends LinearOpMode {
 
   // Drive Wheels
   // Create Drive Wheel motors
-  private DcMotor frontLeftDrive;
-  private DcMotor frontRightDrive;
-  private DcMotor backLeftDrive;
-  private DcMotor backRightDrive;
-  
+
   // Create motors and velocity controller for flywheels
   private DcMotorEx flyWheelRightMoto;
   private DcMotorEx flyWheelLeftMoto;
   // private PIDFController velocityController;
- 
+
   // Create other motors
-  // 
+  //
   private DcMotor intakeMoto;
   private DcMotor sorterMoto;
-  
+
   // Create all servos
   private Servo pushBallFront;
   private Servo pushBallBack;
   private Servo lift;
   private Servo flipper;
-  
-  // This declares the IMU needed to get the current direction the robot is facing
-  IMU imu;
-    
-  // Create color sensor  
+
+  // Create color sensor
   private NormalizedColorSensor color;
-  
+
   // Create Limelight
   private Limelight3A limeLight;
   private int pipeLineGoalTags = 0;
-  
+
   // Declare static variables
   private double reduceSpeed = 1.0;
-  
+
   private static double powerConstant = .51;
-  
+
   // set lift servo down and up positions
   // Larger number is down and small numbers raise lift higher
   private static double liftDownPosition = 0.9;
   private static double liftUpPosition = 0.53;
-  
+
   //set pushBallFront servo down and up positions
   // note: closer to 1, the lower the height
   private static double pushBallFUpPos = 0.5;
   private static double pushBallFSortPos = 0.6;
   private static double pushBallFDownPos = 1.0;
-  
+
   //set pushBallBack servo down and up positions
   private static double pushBallBUpPos = 0.3;
   private static double pushBallBDownPos = .6;
   // set positions for flipper to shoot ball
   private static double flipPositionInit = 0.0;
   private static double flipPositionShoot = 0.7;
-  
+
   private static double sorterPowerSpeed = 0.4;
   private static double sorterPowerSpeedIntake = 0.35;
   private static double sorterPowerSpeedReset = 1.0;
   private static int rotateSorterRotateDelay = 200;
-  private static double sorterPowerSpeedStop = 0.0; 
- 
+  private static double sorterPowerSpeedStop = 0.0;
+
   private static int sorterIntakePos = 0;
 
   // check for color ball - norm colors for green and red RBG
@@ -137,22 +128,22 @@ public class TeleOpMain extends LinearOpMode {
   /* Calibration Numbers for color sensor values in classroom
 
          Note: need to be calibrated at each event!!!
-      
+
          Green Ball:
               Red   Min: 0.160      Max: 0.223
               Green Min: 0.200    Max: 0.297
               Blue  Min: 0.240    Max: 0.297
- 
-         Purple Ball: 
+
+         Purple Ball:
               Red   Min: 0.294      Max: 0.308
-              Green Min: 0.318      Max: 0.333
+              Green Min: 0.318     Max: 0.333
               Blue  Min: 0.170     Max: 0.172
- 
-         No Ball: 
+
+         No Ball:
               Red   Min: 0.122     Max: 0.125
               Green Min: 0.144     Max: 0.146
               Blue  Min: 0.077    Max: 0.077
-             
+
   */
   //***********************************************************
 
@@ -161,58 +152,23 @@ public class TeleOpMain extends LinearOpMode {
 
   private static double normGreenforPurpleBall = 0.45; // greater than
   private static double normRedforPurpleBall = 0.5;  // less than
-  
+
   private double targetVelocity = 1620; // target velocity in RPM
-  
+
   // Blinkin
   private RevBlinkinLedDriver blinkinLedDriver;
-  
+
   private RevBlinkinLedDriver.BlinkinPattern BasePattern = RevBlinkinLedDriver.BlinkinPattern.GOLD;
   private RevBlinkinLedDriver.BlinkinPattern PurpleBall = RevBlinkinLedDriver.BlinkinPattern.VIOLET;
   private RevBlinkinLedDriver.BlinkinPattern GreenBall = RevBlinkinLedDriver.BlinkinPattern.GREEN;
 
   private double wheelPower = 0.0;
   private static double scaleForDist = 171.5592;
-  
+
   protected enum DisplayKind {
-        MANUAL,
+    MANUAL,
 
-        AUTO
-  }
-
-  void driveFieldRelative(double forward, double strafe, double rotate) {
-      //First, convert diretion being asked to drive to polar cordinates
-      double theta = Math.atan2(forward, strafe);
-      double r = Math.hypot(strafe, forward);
-      //Second, rotate angle by the angle the robot is pointing
-      theta = AngleUnit.normalizeRadians(theta -
-              imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
-      //Third, convert back to cartesian
-      double newForward = r * Math.sin(theta);
-      double newStrafe = r * Math.cos(theta);
-      //Fianlly, call the drive method with robot relative forward and right amounts
-      drive(newForward, newStrafe, rotate);
-  }
-
-  void drive(double forward, double strafe, double rotate) {
-      //This calculate the power needed for each wheel based on the amount forward ,
-      double frontLeftPower = forward + strafe + rotate;
-      double frontRightPower = forward - strafe - rotate;
-      double backRightPower = forward + strafe - rotate;
-      double backLeftPower = forward - strafe + rotate;
-
-      double maxPower = 1.0;
-      double maxSpeed = 1.0;
-
-      maxPower = Math.max(maxPower, Math.abs(frontLeftPower));
-      maxPower = Math.max(maxPower, Math.abs(frontRightPower));
-      maxPower = Math.max(maxPower, Math.abs(backRightPower));
-      maxPower = Math.max(maxPower, Math.abs(backLeftPower));
-
-      frontLeftDrive.setPower(maxSpeed * (frontLeftPower / maxPower));
-      frontRightDrive.setPower(maxSpeed * (frontRightPower / maxPower));
-      backLeftDrive.setPower(maxSpeed * (backLeftPower / maxPower));
-      backRightDrive.setPower(maxSpeed * (backRightPower / maxPower));
+    AUTO
   }
 
   /**
@@ -227,102 +183,61 @@ public class TeleOpMain extends LinearOpMode {
     boolean motorOn = false;
     boolean lastMotorState = false;
     int currentSorterPos = 0;
-    
-    
+
+
 
     //****************************************//
     // Map all robot hardware                 //
-    //****************************************//   
-    
+    //****************************************//
+
     // Mapped drive train wheels
-    frontLeftDrive = hardwareMap.get(DcMotor.class,"FLMoto");
-    frontRightDrive = hardwareMap.get(DcMotor.class,"FRMoto"); //Was BR
-    backLeftDrive = hardwareMap.get(DcMotor.class,"BLMoto");
-    backRightDrive = hardwareMap.get(DcMotor.class,"BRMoto"); //Was FR
-    
+
     // map motors for ball intake and ball sorter
     //intakeMoto = hardwareMap.get(DcMotor.class,"intake");
     //sorterMoto = hardwareMap.get(DcMotor.class,"Sorter");
-    
+
     // map fly wheels motors
     //flyWheelRightMoto = hardwareMap.get(DcMotorEx.class,"flyWheelRight");
-      //flyWheelLeftMoto = hardwareMap.get(DcMotorEx.class,"flyWheelLeft");
-    
+    //flyWheelLeftMoto = hardwareMap.get(DcMotorEx.class,"flyWheelLeft");
+
     //color = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
     //color.setGain(3);  // increase sensitivity of the color sensor
-    
+
     // velocityController = new PIDFController (
     //    new P(0.1), // P gain
     //    new I(0.0), // I gain
     //    new D(0.0), // D gain
-    //    new F(0.0)  // F gain 
+    //    new F(0.0)  // F gain
     //    );
-    
+
     // set the target velocity for the flywheel
     // volocityController.setTargetVelocity(targetVelocity);
 
-      // map ALL servos
+    // map ALL servos
     //lift = hardwareMap.servo.get("lift");
     //pushBallFront = hardwareMap.servo.get("pushBall");
     //pushBallBack = hardwareMap
-      //      .servo.get("pushballback");
+    //      .servo.get("pushballback");
     //flipper = hardwareMap.servo.get("flipper");
-    
+
     // Blinkin - map LED lights
     //blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkinLed");
     //blinkinLedDriver.setPattern(BasePattern);
 
-    // map and intiialize IMU on control hub for field relative driving.
-      imu = hardwareMap.get(IMU.class, "imu");
-
-// Match these directions to the physical orientation of the Control Hub.
-      RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
-              RevHubOrientationOnRobot.LogoFacingDirection.DOWN;
-
-      RevHubOrientationOnRobot.UsbFacingDirection usbDirection =
-              RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
-
-      RevHubOrientationOnRobot RevOrientation = new RevHubOrientationOnRobot(
-              logoDirection,
-              usbDirection);
-
-      imu.initialize(new IMU.Parameters(RevOrientation));
-        
     // Map LimeLight
     //limeLight = hardwareMap.get(Limelight3A.class, "limelight");
     //limeLight.pipelineSwitch(pipeLineGoalTags); // need to setup pipeline for april tags
-    
-   
+
+
 
     //*****************************************//
     // Put initialization blocks here.         //
     //*****************************************//
-        
+
     //***************************************************//
     // Set direction of all motors                       //
     //***************************************************//
-    
-    frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-    frontLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-    frontRightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-    frontRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-
-    backLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-    backLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-    backRightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-    backRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    
     //intakeMoto.setDirection(DcMotorSimple.Direction.REVERSE);
     //intakeMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     //intakeMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -348,14 +263,14 @@ public class TeleOpMain extends LinearOpMode {
     //pushBallFront.setPosition(pushBallFDownPos);
     //pushBallBack.setPosition(pushBallBDownPos);
     //flipper.setPosition(flipPositionInit);
-    
 
-    
+
+
     /*
      * Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.
-     * The limeLight will drain the battery so since this is teleop, we can start the limeLight and 
+     * The limeLight will drain the battery so since this is teleop, we can start the limeLight and
      * don't need to wait for the start button to be pressed.
-    */
+     */
     //limeLight.start();
 
     telemetry.addData(">", "Robot Ready.  Press Play.");
@@ -363,16 +278,16 @@ public class TeleOpMain extends LinearOpMode {
 
     telemetry.addData("Pattern: ", BasePattern.toString());
     telemetry.update();
-    
+
     // Wait for the start of TeleOp
     waitForStart();
-    
+
     // Put run blocks here.
 
     //******************************************//
     // Run code while op mode is active         //
     //******************************************//
-    while (opModeIsActive()) 
+    while (opModeIsActive())
     {
 
       double forward = -gamepad1.left_stick_y;
@@ -381,13 +296,13 @@ public class TeleOpMain extends LinearOpMode {
 
       drive.driveFieldRelative(forward, strafe, rotate);
         /* NormalizedRGBA ballColor = color.getNormalizedColors();
-        
+
         float normRed, normGreen, normBlue;
 
         normRed = ballColor.red /ballColor.alpha;
         normGreen = ballColor.green /ballColor.alpha;
         normBlue = ballColor.blue /ballColor.alpha;
-        
+
         telemetry.addLine();
         telemetry.addData("Red", "%.3f", normRed);
         telemetry.addData("Green", "%.3f", normGreen);
@@ -400,7 +315,7 @@ public class TeleOpMain extends LinearOpMode {
         }
         else if (normGreen > normGreenforPurpleBall && normRed < normRedforPurpleBall) {
           blinkinLedDriver.setPattern(PurpleBall);
-        } 
+        }
         else {
             blinkinLedDriver.setPattern(BasePattern);
         }
@@ -411,52 +326,52 @@ public class TeleOpMain extends LinearOpMode {
 
           //lifter goes up
           lift.setPosition(liftUpPosition);
-       
+
           sleep(500);
           pushBallBack.setPosition(pushBallBDownPos);
           //flipper pushes to launcher
           flipper.setPosition(flipPositionShoot);
-          
+
           sleep(250);
-          
+
           //flipper resets to init
           flipper.setPosition(flipPositionInit);
 
           //lifter comes down to init
           lift.setPosition(liftDownPosition);
 
-       } 
-       
+       }
+
       // push ball front flap up during intake
       if(gamepad1.dpad_up)
       {
           pushBallFront.setPosition(pushBallFSortPos);
           sleep(100);
-          
-          sorterMoto.setPower(sorterPowerSpeedIntake);          
+
+          sorterMoto.setPower(sorterPowerSpeedIntake);
           sleep(rotateSorterRotateDelay);
           sorterMoto.setPower(sorterPowerSpeedStop);
-          
+
       }
-      
+
       // push ball front flap up sorting setting for rotating the balls
       if(gamepad1.dpad_right)
       {
           pushBallFront.setPosition(pushBallFSortPos);
       }
-      
+
       // reset pushball up front flap down to init state
       if(gamepad1.dpad_down)
       {
           pushBallFront.setPosition(pushBallFDownPos);
       }
-      
+
         //intake spins inwards
        if(gamepad1.left_bumper)
        {
           intakeMoto.setPower(1.0);
           pushBallFront.setPosition(pushBallFDownPos);
-       } 
+       }
        else if (gamepad1.right_bumper)
        {
           intakeMoto.setPower(-1.0);
@@ -466,41 +381,41 @@ public class TeleOpMain extends LinearOpMode {
        {
           intakeMoto.setPower(0.0);
 
-       } 
-       
+       }
+
       */
       //
       // code to toogle the on and off of the fly wheels using the "b" button on game pad 1
-      // 
+      //
 
       // read current state of button "b"
       boolean currentMotorState = gamepad1.b;
-      
+
       // check if the button was just pressed
       // compare current state of the button to the last state of the button
       // which helps determine if the motor needs to be turned on or off
       if (currentMotorState && !lastMotorState) {
-          // Toggle the motor state
-          motorOn = !motorOn;
+        // Toggle the motor state
+        motorOn = !motorOn;
       }
-      
+
       // Always update the last button/motor state for the next loop
       lastMotorState = currentMotorState;
-      
+
       // control the motor based on the toggle state
       if(motorOn){
-             
-          //LLResult lastResult = limeLight.getLatestResult();
-          
+
+        //LLResult lastResult = limeLight.getLatestResult();
+
           /* if (lastResult != null && lastResult.isValid()) {
-                          
+
              double targetArea = lastResult.getTa();
-       
+
              telemetry.clearAll();
-             
+
              telemetry.addData("Target Area",targetArea );
              telemetry.update();
-             
+
              if (targetArea > 3.5){
                wheelPower = 0.90;
              }
@@ -513,9 +428,9 @@ public class TeleOpMain extends LinearOpMode {
              else {
                wheelPower = 0.90;
              }
-             
+
              telemetry.clearAll();
-             
+
              telemetry.addData("Target Area", targetArea );
              telemetry.addData("Wheel Speed", wheelPower );
             telemetry.update();
@@ -524,43 +439,43 @@ public class TeleOpMain extends LinearOpMode {
             wheelPower = .85;
           } */
 
-          // turn on fly wheels           telemetry.clearAll();
-          //flyWheelRightMoto.setPower(wheelPower);
-          //flyWheelLeftMoto.setPower(wheelPower);
+        // turn on fly wheels           telemetry.clearAll();
+        //flyWheelRightMoto.setPower(wheelPower);
+        //flyWheelLeftMoto.setPower(wheelPower);
       }
       else {
-          //flyWheelRightMoto.setPower(0.0);
-          //flyWheelLeftMoto.setPower(0.0);
+        //flyWheelRightMoto.setPower(0.0);
+        //flyWheelLeftMoto.setPower(0.0);
       }
-       
-      // Sort ball clockwise 
+
+      // Sort ball clockwise
       if(gamepad1.y){
-         //sorterMoto.setPower(sorterPowerSpeed);
-         
-          // delay request amout of time;
-          sleep(rotateSorterRotateDelay);
+        //sorterMoto.setPower(sorterPowerSpeed);
 
-          // stop sorter motor
-         // sorterMoto.setPower(sorterPowerSpeedStop);
+        // delay request amout of time;
+        sleep(rotateSorterRotateDelay);
+
+        // stop sorter motor
+        // sorterMoto.setPower(sorterPowerSpeedStop);
 
       }
 
-      // Sort ball counter clockwise 
+      // Sort ball counter clockwise
       if(gamepad1.x){
         // sorterMoto.setPower(-sorterPowerSpeed);
-         
-         //delay request amout of time;
-          sleep(rotateSorterRotateDelay);
 
-         // stop sorter motor
-          //sorterMoto.setPower(sorterPowerSpeedStop);
-          
-          
-          
-          //sorterMoto.setPower(0);
+        //delay request amout of time;
+        sleep(rotateSorterRotateDelay);
+
+        // stop sorter motor
+        //sorterMoto.setPower(sorterPowerSpeedStop);
+
+
+
+        //sorterMoto.setPower(0);
       }
 
-    //Movement
+      //Movement
 
       /* driveFieldRelative(
               -gamepad1.left_stick_y, //forward/back
@@ -572,7 +487,7 @@ public class TeleOpMain extends LinearOpMode {
 
         */
     }
-    
+
   }
 }
 
@@ -588,7 +503,7 @@ public class TeleOpMain extends LinearOpMode {
 //
 //  Buttons
 //    a = lift ball and shootzzz
-//    x = sorter moves to 50 (first ball) 
+//    x = sorter moves to 50 (first ball)
 //    y = sorter moves to 140 (second ball)
 //    left_bumper = intake motor on/off
 //    right_bumper = strafe right
@@ -596,10 +511,9 @@ public class TeleOpMain extends LinearOpMode {
 //    right_trigger = intake motor spin outtake
 //    back = sorter moves back to zero
 //    start = sorter moves thrid part
-//  
+//
 //  hat
 //    dpad_up = move flipper for intake up
 //    dpad_down = move flipper for intake all the way down
 //    dpad_right = move flipper for intake part way for sorting
 //    dpad_left = not used
-  
