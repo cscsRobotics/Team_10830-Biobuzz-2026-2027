@@ -87,9 +87,9 @@ public class FieldOrientatedDrive {
 
         drive(rotY, rotX, rotate);
     }
-    public double getHeadingDegrees() {
+    public double getHeadingRadians() {
         return imu.getRobotYawPitchRollAngles()
-                .getYaw(AngleUnit.DEGREES);
+                .getYaw(AngleUnit.RADIANS);
     }
 
 }

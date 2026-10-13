@@ -42,7 +42,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
+import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.RADIANS;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
@@ -297,7 +297,7 @@ public class TeleOpMain extends LinearOpMode {
       drive.driveFieldRelative(forward, strafe, rotate);
 
       telemetry.addData("IMU Heading", "%.1f",
-              drive.getHeadingDegrees());
+              drive.getHeadingRadians());
       telemetry.update();
         /* NormalizedRGBA ballColor = color.getNormalizedColors();
 
