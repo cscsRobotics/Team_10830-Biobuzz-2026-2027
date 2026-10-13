@@ -51,6 +51,7 @@ public class FieldOrientatedDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD);
 
         imu.initialize(new IMU.Parameters(RevOrientation));
+        imu.resetYaw();
     }
 
     public void drive(double forward, double strafe, double rotate) {
@@ -87,9 +88,9 @@ public class FieldOrientatedDrive {
 
         drive(rotY, rotX, rotate);
     }
-    public double getHeadingRadians() {
+    public double getHeadingDegrees() {
         return imu.getRobotYawPitchRollAngles()
-                .getYaw(AngleUnit.RADIANS);
+                .getYaw(AngleUnit.DEGREES);
     }
 
 }

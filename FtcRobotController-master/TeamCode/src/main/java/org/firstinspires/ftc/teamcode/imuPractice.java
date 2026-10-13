@@ -6,7 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.TestIMU;
 
-@TeleOp
+
+
 public class imuPractice extends OpMode {
 
     TestIMU bench =  new TestIMU();
