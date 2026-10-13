@@ -295,6 +295,10 @@ public class TeleOpMain extends LinearOpMode {
       double rotate = gamepad1.right_stick_x;
 
       drive.driveFieldRelative(forward, strafe, rotate);
+
+      telemetry.addData("IMU Heading", "%.1f",
+              drive.getHeadingDegrees());
+      telemetry.update();
         /* NormalizedRGBA ballColor = color.getNormalizedColors();
 
         float normRed, normGreen, normBlue;
