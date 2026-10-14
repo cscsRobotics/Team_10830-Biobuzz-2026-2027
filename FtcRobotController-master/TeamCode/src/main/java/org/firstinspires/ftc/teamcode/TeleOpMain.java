@@ -290,6 +290,7 @@ public class TeleOpMain extends LinearOpMode {
     while (opModeIsActive())
     {
 
+      //establish FieldOrientatedDrive controls from java class
       double forward = -gamepad1.left_stick_y;
       double strafe = gamepad1.left_stick_x;
       double rotate = gamepad1.right_stick_x;
