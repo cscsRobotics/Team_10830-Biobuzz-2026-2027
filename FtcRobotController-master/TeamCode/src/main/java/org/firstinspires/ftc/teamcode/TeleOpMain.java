@@ -216,8 +216,7 @@ public class TeleOpMain extends LinearOpMode {
     // map ALL servos
     //lift = hardwareMap.servo.get("lift");
     //pushBallFront = hardwareMap.servo.get("pushBall");
-    //pushBallBack = hardwareMap
-    //      .servo.get("pushballback");
+    //pushBallBack = hardwareMap.servo.get("pushballback");
     //flipper = hardwareMap.servo.get("flipper");
 
     // Blinkin - map LED lights
