@@ -59,7 +59,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 // import for IMU (gyroscope)
 
 
-public class intakeAndSortMotors {
+public class IntakeAndSortMotors {
 
     private DcMotor intakeMoto;
     private DcMotor sorterMoto;
@@ -77,7 +77,7 @@ public class intakeAndSortMotors {
 
         sorterMoto.setDirection(DcMotorSimple.Direction.FORWARD);
         sorterMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        sorterMoto.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+       // sorterMoto.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         sorterMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         sorterMoto.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         sorterMoto.setTargetPosition(0);
