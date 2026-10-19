@@ -29,12 +29,17 @@ public class FieldOrientatedDrive {
         frontRightDrive = hardwareMap.get(DcMotor.class, "FRMoto");
         backRightDrive = hardwareMap.get(DcMotor.class, "BRMoto");
 
-        pinpoint.setOffsets(185.0,133.0);
+        //odometry computer configuration
+        pinpoint.setOffsets(185.0,133.0, DistanceUnit.MM);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
+        //odometry starting position
         pinpoint.resetPosAndIMU();
-        Pose2D startingPosition = new Pose2D(DistanceUnit.INCH)
+        Pose2D startingPosition = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
+        //fix starting position for pinpoint for TeleOp and Autonomous modes to ensure accurate readings of the computer
+        pinpoint.setPosition(startingPosition);
+
 
 
         frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -58,7 +63,7 @@ public class FieldOrientatedDrive {
         backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        imu = hardwareMap.get(IMU.class, "imu");
+        //imu = hardwareMap.get(IMU.class, "imu");
 
         RevHubOrientationOnRobot RevOrientation = new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
@@ -91,8 +96,11 @@ public class FieldOrientatedDrive {
 
     public void driveFieldRelative(double forward, double strafe, double rotate) {
 
-        double botHeading = imu.getRobotYawPitchRollAngles()
-                .getYaw(AngleUnit.RADIANS);
+        pinpoint.update();
+
+        Pose2D pos = pinpoint.getPosition();
+
+        double botHeading = pos.getHeading(AngleUnit.RADIANS);
 
         double rotX = strafe * Math.cos(-botHeading)
                 - forward * Math.sin(-botHeading);
@@ -103,8 +111,9 @@ public class FieldOrientatedDrive {
         drive(rotY, rotX, rotate);
     }
     public double getHeadingDegrees() {
-        return imu.getRobotYawPitchRollAngles()
-                .getYaw(AngleUnit.DEGREES);
+        pinpoint.update();
+        Pose2D pos = pinpoint.getPosition();
+        return pos.getHeading(AngleUnit.DEGREES);
     }
 
 }
