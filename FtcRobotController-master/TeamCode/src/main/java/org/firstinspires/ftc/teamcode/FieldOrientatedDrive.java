@@ -28,7 +28,7 @@ public class FieldOrientatedDrive {
         backRightDrive = hardwareMap.get(DcMotor.class, "BRMoto");
 
         //odometry computer configuration
-        pinpoint.setOffsets(185.0,133.0, DistanceUnit.MM);
+        pinpoint.setOffsets(-185.0,-133.0, DistanceUnit.MM);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
 

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -9,8 +10,8 @@ public class PinpointOdometry {
     private final GoBildaPinpointDriver pinpoint;
     
     // Geometry Constants (Modify these to match your physical robot)
-    private static final double X_OFFSET_MM = -42.0; // Distance from center of robot to X pod
-    private static final double Y_OFFSET_MM = -12.0; // Distance from center of robot to Y pod
+    private static final double X_OFFSET_MM = -185.0; // Distance from center of robot to X pod
+    private static final double Y_OFFSET_MM = -133.0; // Distance from center of robot to Y pod
     
     /**
      * Constructor to initialize the Pinpoint Odometry Computer
@@ -21,7 +22,7 @@ public class PinpointOdometry {
         pinpoint = hwMap.get(GoBildaPinpointDriver.class, "pinpoint");
         
         // Configure Pinpoint hardware settings
-        pinpoint.setOffsets(X_OFFSET_MM, Y_OFFSET_MM);
+        pinpoint.setOffsets(X_OFFSET_MM, Y_OFFSET_MM, DistanceUnit.MM);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         
