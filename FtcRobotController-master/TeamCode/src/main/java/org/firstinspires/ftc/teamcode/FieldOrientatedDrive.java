@@ -5,10 +5,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class FieldOrientatedDrive {
+
+    GoBildaPinpointDriver pinpoint;
     private DcMotor frontLeftDrive;
     private DcMotor frontRightDrive;
     private DcMotor backLeftDrive;
@@ -16,6 +20,8 @@ public class FieldOrientatedDrive {
     private IMU imu;
 
     public void init(HardwareMap hardwareMap) {
+        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
+
         frontLeftDrive = hardwareMap.get(DcMotor.class, "FLMoto");
         backLeftDrive = hardwareMap.get(DcMotor.class, "BLMoto");
         frontRightDrive = hardwareMap.get(DcMotor.class, "FRMoto");
