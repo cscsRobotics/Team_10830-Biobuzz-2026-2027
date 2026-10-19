@@ -1,10 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-<<<<<<< Updated upstream:FtcRobotController-master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/IntakeAndSortMotors.java
 import com.qualcomm.robotcore.hardware.HardwareMap;
-=======
-import com.qualcomm. robotcore.hardware.HardwareMap;
->>>>>>> Stashed changes:FtcRobotController-master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/intakeAndSortMotors.java
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
@@ -55,19 +51,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 
 
 
-<<<<<<< Updated upstream:FtcRobotController-master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/IntakeAndSortMotors.java
-// Blinkin
-
-
-// Driving with Gyro (IMU) classes
-//
-// import for IMU (gyroscope)
-
-
 public class IntakeAndSortMotors {
-=======
-public class intakeAndSortMotors {
->>>>>>> Stashed changes:FtcRobotController-master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/intakeAndSortMotors.java
 
     private DcMotor intakeMoto;
     private DcMotor sorterMoto;
