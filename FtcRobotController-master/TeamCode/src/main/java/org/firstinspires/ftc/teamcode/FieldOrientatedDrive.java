@@ -9,6 +9,8 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 public class FieldOrientatedDrive {
 
@@ -27,6 +29,12 @@ public class FieldOrientatedDrive {
         frontRightDrive = hardwareMap.get(DcMotor.class, "FRMoto");
         backRightDrive = hardwareMap.get(DcMotor.class, "BRMoto");
 
+        pinpoint.setOffsets(185.0,133.0);
+        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+
+        pinpoint.resetPosAndIMU();
+        Pose2D startingPosition = new Pose2D(DistanceUnit.INCH)
 
 
         frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
