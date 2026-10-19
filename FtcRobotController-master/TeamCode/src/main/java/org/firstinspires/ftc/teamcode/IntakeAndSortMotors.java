@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
+<<<<<<< Updated upstream:FtcRobotController-master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/IntakeAndSortMotors.java
 import com.qualcomm.robotcore.hardware.HardwareMap;
+=======
+import com.qualcomm. robotcore.hardware.HardwareMap;
+>>>>>>> Stashed changes:FtcRobotController-master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/intakeAndSortMotors.java
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
@@ -51,6 +55,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 
 
 
+<<<<<<< Updated upstream:FtcRobotController-master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/IntakeAndSortMotors.java
 // Blinkin
 
 
@@ -60,9 +65,21 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 
 
 public class IntakeAndSortMotors {
+=======
+public class intakeAndSortMotors {
+>>>>>>> Stashed changes:FtcRobotController-master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/intakeAndSortMotors.java
 
     private DcMotor intakeMoto;
     private DcMotor sorterMoto;
+
+    //create motor speeds
+    private static double sorterPowerSpeed = 0.4;
+    private static double sorterPowerSpeedIntake = 0.35;
+    private static double sorterPowerSpeedReset = 1.0;
+    private static int rotateSorterRotateDelay = 200;
+    private static double sorterPowerSpeedStop = 0.0;
+
+    private static int sorterIntakePos = 0;
 
     public void init(HardwareMap hardwareMap) {
 
