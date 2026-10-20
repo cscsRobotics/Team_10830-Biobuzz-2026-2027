@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+
+
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -44,7 +46,7 @@ public class PinpointOdometry {
      * @return Current robot heading in Radians (-PI to +PI)
      */
     public double getHeading() {
-        return pinpoint.getHeading();
+        return pinpoint.getHeading(AngleUnit.RADIANS);
     }
     
     /**
@@ -52,7 +54,7 @@ public class PinpointOdometry {
      * @return Current robot heading in Degrees (-180 to +180)
      */
     public double getHeadingDegrees() {
-        return Math.toDegrees(pinpoint.getHeading());
+        return pinpoint.getHeading(AngleUnit.DEGREES);
     }
     
     /**

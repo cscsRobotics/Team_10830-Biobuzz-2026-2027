@@ -38,7 +38,7 @@ public class FieldOrientatedDrive {
         //fix starting position for pinpoint for TeleOp and Autonomous modes to ensure accurate readings of the computer
         pinpoint.setPosition(startingPosition);
 
-
+        pinpoint.update();
 
         frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
