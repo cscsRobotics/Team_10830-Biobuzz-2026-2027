@@ -1,9 +1,13 @@
 repositories {
+    maven { url 'https://repo.dairy.foundation/releases/'}
     mavenCentral()
     google() // Needed for androidx
 }
 
 dependencies {
+    //added pedro pathing installation
+    implementation 'com.pedropathing:revhub:3.0.2'
+    implementation 'com.pedropathing:tuning:1.0.0'
     implementation 'org.firstinspires.ftc:Inspection:12.0.0'
     implementation 'org.firstinspires.ftc:Blocks:12.0.0'
     implementation 'org.firstinspires.ftc:RobotCore:12.0.0'
