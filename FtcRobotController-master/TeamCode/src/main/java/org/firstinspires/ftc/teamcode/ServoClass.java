@@ -10,8 +10,6 @@ public class ServoClass {
     private static double ballAdjustSmall; //set values from testing
     private static double ballAdjustBig; //set values from testing
 
-75;
-
     private boolean smallBallPosition = true;
 
     public ServoClass(HardwareMap hardwareMap) {
