@@ -10,6 +10,33 @@ public class ServoClass {
     private static double ballAdjustSmall; //set values from testing
     private static double ballAdjustBig; //set values from testing
 
+75;
 
+    private boolean smallBallPosition = true;
+
+    public ServoClass(HardwareMap hardwareMap) {
+
+        ballAdjustment = hardwareMap.get(Servo.class, "ballAdjustment");
+
+        ballAdjustment.setPosition(ballAdjustSmall);
+      }
+
+    public void togglePosition() {
+
+        if (smallBallPosition) {
+
+            ballAdjustment.setPosition(ballAdjustBig);
+
+        } else {
+
+            ballAdjustment.setPosition(ballAdjustSmall);
+
+        }
+
+        smallBallPosition = !smallBallPosition;
+
+    }
 
 }
+
+
