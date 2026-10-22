@@ -11,5 +11,12 @@ public class ServoClass {
     private static double ballAdjustBig; //set values from testing
 
 
+    public void init(HardwareMap hardwareMap) {
 
+        ballAdjustment = hardwareMap.servo.get("ballAdjustment");
+
+
+    }
+
+    //ballAdjustment.setPosition(ballAdjustmentSmall);
 }
