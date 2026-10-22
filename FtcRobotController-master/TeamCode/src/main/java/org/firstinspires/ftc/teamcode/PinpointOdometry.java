@@ -26,7 +26,7 @@ public class PinpointOdometry {
         // Configure Pinpoint hardware settings
         pinpoint.setOffsets(X_OFFSET_MM, Y_OFFSET_MM, DistanceUnit.MM);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         
         // Fully recalibrate gyro tracking and reset positioning axes
         // Note: Robot MUST be perfectly still during this instantiation step!
