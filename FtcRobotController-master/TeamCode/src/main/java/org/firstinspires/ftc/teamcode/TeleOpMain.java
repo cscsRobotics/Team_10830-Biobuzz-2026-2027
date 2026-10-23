@@ -125,6 +125,10 @@ public class TeleOpMain extends LinearOpMode {
 
   private static int sorterIntakePos = 0;
 
+  private ServoClass ballAdjustment; 
+  private boolean previousGamepad1A = false; 
+
+
   // check for color ball - norm colors for green and red RBG
 
   //***********************************************************
@@ -181,6 +185,8 @@ public class TeleOpMain extends LinearOpMode {
   public void runOpMode() {
 
     drive.init(hardwareMap);
+
+    ballAdjustment = new ServoClass(hardwareMap);
 
     // Variables to toggle the on/off of the fly wheel motors
     boolean motorOn = false;
@@ -302,6 +308,12 @@ public class TeleOpMain extends LinearOpMode {
       telemetry.addData("IMU Heading (degrees)", "%.1f",
               drive.getHeadingDegrees());
       telemetry.update();
+
+      if (gamepad1.a && !previousGamepad1A) {
+                ballAdjustment.togglePosition(); 
+            }
+            previousGamepad1A = gamepad1.a; // Updates the button history
+      
         /* NormalizedRGBA ballColor = color.getNormalizedColors();
 
         float normRed, normGreen, normBlue;
