@@ -85,32 +85,30 @@ import org.firstinspires.ftc.robotcore.external.ClassFactory;
 
 @Autonomous(name = "AutoMain", group = "")
 
-public class AutoMain extends LinearOpMode {
+public class AutoMainOld extends LinearOpMode {
 
     // Drive Wheels
     // Create Drive Wheel motors
+
+    private PinpointOdometry pinpoint;
     private DcMotor frontLeftDrive;
     private DcMotor frontRightDrive;
     private DcMotor backLeftDrive;
     private DcMotor backRightDrive;
 
     // Create motors and velocity controller for flywheels
-    private DcMotorEx flyWheelRightMoto;
-    private DcMotorEx flyWheelLeftMoto;
+
     // private PIDFController velocityController;
 
     // Create other motors
     //
     private DcMotor intakeMoto;
-    private DcMotor sorterMoto;
+
 
     // Create all servos
-    private Servo pushBallFront;
-    private Servo lift;
-    private Servo flipper;
+
 
     // This declares the IMU needed to get the current direction the robot is facing
-    IMU imu;
     private Orientation lastAngle = new Orientation();
 
     // Create color sensor
@@ -173,7 +171,7 @@ public class AutoMain extends LinearOpMode {
     private static final Double gearRatio = 18.9;                  // Rev HD Hex 20:1
     private static final Double countsPerRotation = 560.0;         // Rev HD Hex 20:1
     private static final Double scaleFactor = 17.0;                 // need to find scale factor!!!
-    private static final Double straifFactor = 1.0;
+    private static final Double strafeFactor = 1.0;
     private static final Double countsPerInch = countsPerRotation / wheelCircumference / gearRatio * scaleFactor;
 
 
@@ -204,7 +202,6 @@ public class AutoMain extends LinearOpMode {
     /*********************/
     double               globalAngle, correction;
     YawPitchRollAngles   lastAngles;
-
     double voltage = 0;
     double batteryConst = 13.5;
     private static double powerConstant = .5;
@@ -214,25 +211,9 @@ public class AutoMain extends LinearOpMode {
 
     // set lift servo down and up positions
     // Larger number is down and small numbers raise lift higher
-    private static double liftDownPosition = 0.9;
-    private static double liftUpPosition = 0.53;
 
-    //set pushBallFront servo down and up positions
-    // note: closer to 1, the lower the flipper
-    private static double pushBallFUpPos = 0.5;
-    private static double pushBallFSortPos = 0.61;
-    private static double pushBallFDownPos = 1.0;
 
-    // set positions for flipper to shoot ball
-    private static double flipPositionInit = 0.0;
-    private static double flipPositionShoot = 0.7;
-
-    private static double sorterPowerSpeed = 0.30;
-    private static int rotateSorterRotateDelay = 215;
-    private static int sorterPowerSpeedStop = 0;
-
-    private static int sorterIntakePos = 0;
-
+    //set pushBallFront servo down and up position
     // check for color ball - norm colors for green and red RBG
 
     //***********************************************************
@@ -256,13 +237,7 @@ public class AutoMain extends LinearOpMode {
               Blue  Min: 0.086     Max: 0.087
 
     */
-    //***********************************************************
-
-    private static double normGreenforGreenBall = 0.7;  // greater than
-    private static double normRedforGreenBall = 0.5;   // less than
-
-    private static double normGreenforPurpleBall = 0.3; // greater than
-    private static double normRedforPurpleBall = 0.5;  // greater than
+    //***********************************************************// greater than
 
 
     // Global Variables to  Game Specific Information
@@ -441,6 +416,13 @@ public class AutoMain extends LinearOpMode {
         // Map all robot hardware                 //
         //****************************************//
 
+        pinpoint = new PinpointOdometry(hardwareMap);
+        pinpoint.setPose(0.0, 0.0, 0.0);
+
+        telemetry.addLine("Pinpoint Odometry Initialized!");
+        telemetry.addLine("Keep robot still until start.");
+        telemetry.update();
+
         // Mapped drive train wheels
         frontLeftDrive = hardwareMap.get(DcMotor.class,"FLMoto");
         frontRightDrive = hardwareMap.get(DcMotor.class,"FRMoto"); //Was BR
@@ -449,19 +431,7 @@ public class AutoMain extends LinearOpMode {
 
         // map motors for ball intake and ball sorter
         intakeMoto = hardwareMap.get(DcMotor.class,"intake");
-        sorterMoto = hardwareMap.get(DcMotor.class,"Sorter");
 
-
-        // map fly wheels motors
-        flyWheelRightMoto = hardwareMap.get(DcMotorEx.class,"flyWheelRight");
-        flyWheelLeftMoto = hardwareMap.get(DcMotorEx.class,"flyWheelLeft");
-
-        //********************/
-        //* Map All Servos   */
-        //********************/
-        lift = hardwareMap.servo.get("lift");
-        pushBallFront = hardwareMap.servo.get("pushBall");
-        flipper = hardwareMap.servo.get("flipper");
 
         //map sensor
         color = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
@@ -473,39 +443,15 @@ public class AutoMain extends LinearOpMode {
         blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkinLed");
         blinkinLedDriver.setPattern(BasePattern);
 
-        /************************/
-        /* Setup IMU parameters */
-        /************************/
-
-        // Retrieve and initialize the IMU. The IMU should be attached to
-        // IC2 port 0 on a Core Device Interface Module
-        imu = hardwareMap.get(IMU.class, "imu");
-
         /* The next two lines define Hub orientation.
          * The Default Orientation (shown) is when a hub is mounted horizontally with the printed logo pointing UP and the USB port pointing FORWARD.
          *
          * To Do:  EDIT these two lines to match YOUR mounting configuration.
          */
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
-        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.UP;
 
         telemetry.addData("Mode","calibrating imu...." );
         telemetry.update();
 
-        try {
-            RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
-            imu.initialize(new IMU.Parameters(orientationOnRobot));
-
-            telemetry.addData("imu calib status", "calibrated" );
-            telemetry.update();
-
-            // initialize imu global variables after calibrating imu
-            resetAngle();
-
-        } catch (IllegalArgumentException e) {
-            telemetry.addData("imu calib status", "failed - try again");
-            telemetry.update();
-        }
 
         // Map LimeLight
         limeLight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -538,25 +484,6 @@ public class AutoMain extends LinearOpMode {
         intakeMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        sorterMoto.setDirection(DcMotorSimple.Direction.FORWARD);
-        sorterMoto.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        sorterMoto.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        // sorterMoto.setTargetPosition(0);
-
-        flyWheelRightMoto.setDirection(DcMotorSimple.Direction.FORWARD);
-        flyWheelRightMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        flyWheelRightMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        flyWheelRightMoto.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        flyWheelLeftMoto.setDirection(DcMotorSimple.Direction.REVERSE);
-        flyWheelLeftMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        flyWheelLeftMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        flyWheelLeftMoto.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        // Initialize the start positions and direction for servos
-        lift.setPosition(liftDownPosition);
-        pushBallFront.setPosition(pushBallFSortPos);
-        flipper.setPosition(flipPositionInit);
 
         // Create local variable to store selected automous mode
         // and amount of delay time
@@ -636,10 +563,6 @@ public class AutoMain extends LinearOpMode {
                 break;
         }
 
-        // Initialize the start positions and direction for servos
-        lift.setPosition(liftDownPosition);
-        pushBallFront.setPosition(pushBallFDownPos);
-        flipper.setPosition(flipPositionInit);
 
     }
 
@@ -732,7 +655,7 @@ public class AutoMain extends LinearOpMode {
 
 
     /***************************************************************************/
-    /* Function: Blue Audiance                                                  */
+    /* Function: Blue Audience                                                  */
     /* Returns: none                                                           */
     /* Uses Global Variables: motifPattern                                     */
     /*                                                                         */
@@ -1021,8 +944,7 @@ public class AutoMain extends LinearOpMode {
     void shootAllBalls(double flyWheelPower) {
 
         // start flywheels
-        flyWheelRightMoto.setPower(flyWheelPower);
-        flyWheelLeftMoto.setPower(flyWheelPower);
+
 
         sleep(250);
 
@@ -1049,8 +971,7 @@ public class AutoMain extends LinearOpMode {
                 shootOneBall();
 
                 // turn off flywheels
-                flyWheelRightMoto.setPower(0.0);
-                flyWheelLeftMoto.setPower(0.0);
+
 
                 break;
 
@@ -1074,8 +995,7 @@ public class AutoMain extends LinearOpMode {
                 shootOneBall();
 
                 // turn off fly wheels
-                flyWheelRightMoto.setPower(0.0);
-                flyWheelLeftMoto.setPower(0.0);
+
 
                 break;
 
@@ -1103,8 +1023,7 @@ public class AutoMain extends LinearOpMode {
                 shootOneBall();
 
                 // turn off fly wheels
-                flyWheelRightMoto.setPower(0.0);
-                flyWheelLeftMoto.setPower(0.0);
+
 
                 break;
 
@@ -1130,21 +1049,20 @@ public class AutoMain extends LinearOpMode {
     void shootOneBall() {
 
         //lifter goes up to push ball up
-        lift.setPosition(liftUpPosition);
+
 
         sleep(500);
 
         //flipper pushes to launcher
-        flipper.setPosition(flipPositionShoot);
+
 
         sleep(250);
 
         //flipper resets to init
-        flipper.setPosition(flipPositionInit);
         sleep (200);
 
         //lifter comes down to init
-        lift.setPosition(liftDownPosition);
+
         sleep (200);
 
     } // end shootOneBall
@@ -1164,10 +1082,10 @@ public class AutoMain extends LinearOpMode {
         //sorterMoto.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         if (direction == sortDir.CLOCKWISE) {
-            sorterMoto.setPower(sorterPowerSpeed);
+
         }
         else {
-            sorterMoto.setPower(-sorterPowerSpeed);
+
         }
 
         sleep(delay);
@@ -1177,7 +1095,7 @@ public class AutoMain extends LinearOpMode {
         //}
 
         // stop sorter motor
-        sorterMoto.setPower(sorterPowerSpeedStop);
+
 
     }
 
@@ -1211,7 +1129,16 @@ public class AutoMain extends LinearOpMode {
         backLeftDrive.setPower(BLpower);
     }
 
+    private double checkDirection () {
+        pinpoint.update();
 
+        double currentHeading = pinpoint.getHeadingDegrees();
+        double error = normalizeHeading(-currentHeading);
+
+        double Kp = 0.015;
+
+        return error * Kp;
+    }
     /************************************************************/
     /* Function: strafeRight                                    */
     /* Returns: nothing                                         */
@@ -1221,7 +1148,7 @@ public class AutoMain extends LinearOpMode {
     /************************************************************/
     private void strafeRight(Double inches,Double power)
     {
-        driveInches(inches*straifFactor, power, -power, -power, power);
+        driveInches(inches*strafeFactor, power, -power, -power, power);
 
     }
 
@@ -1234,7 +1161,7 @@ public class AutoMain extends LinearOpMode {
     /************************************************************/
     private void strafeLeft(Double inches,Double power)
     {
-        driveInches(inches*straifFactor, -power, power, power, -power);
+        driveInches(inches*strafeFactor, -power, power, power, -power);
     }
 
     /************************************************************/
@@ -1263,6 +1190,15 @@ public class AutoMain extends LinearOpMode {
         driveInches(inches, -power, -power, -power, -power);
     }
 
+    private double normalizeHeading(double angle) {
+        while (angle > 180.0) {
+            angle -= 360.0;
+        }
+        while (angle <= -180.0) {
+            angle += 360.0;
+        }
+        return angle;
+    }
     /************************************************************/
     /*                                                          */
     /* Function: driveInches                                    */
@@ -1274,168 +1210,155 @@ public class AutoMain extends LinearOpMode {
     /* Strafe Forward = negative front wheels, positive back    */
     /* wheels                                                   */
     /************************************************************/
-    private void driveInches(Double inches,Double FLpower,Double FRpower, Double BLpower, Double BRpower)
-    {
-        Double counts = inches * countsPerInch;
-
-        resetEncoders();
-        runUsingEncoders();
-
-        voltage = VoltSens.getVoltage();  // read current battery voltage
-
-        FLpower = ((batteryConst*FLpower)/voltage);
-        FRpower = ((batteryConst*FRpower)/voltage);
-        BLpower = ((batteryConst*BLpower)/voltage);
-        BRpower = ((batteryConst*BRpower)/voltage);
-
-        setDrivePower(FLpower, FRpower, BLpower, BRpower);
-
-        while (opModeIsActive() &&
-                (Math.abs(frontLeftDrive.getCurrentPosition()) + Math.abs(frontRightDrive.getCurrentPosition()) /2) < Math.abs(counts))
+    private void driveInches(Double inches,Double FLpower,Double FRpower, Double BLpower, Double BRpower) {
         {
-            // Use gyro to drive in a straight line.
-            // correction = checkDirection();
 
-            correction = 0;
+            double counts = Math.abs(inches * countsPerInch);
 
-            //telemetry.addData("1 imu heading", lastAngles.firstAngle);
-            // telemetry.addData("2 global heading", globalAngle);
-            // telemetry.addData("3 correction", correction);
-            // telemetry.update();
+            resetEncoders();
+            runUsingEncoders();
 
-            //setDrivePower(FLpower+correction, FRpower-correction, BLpower+correction, BRpower-correction);
-            setDrivePower(FLpower-correction, FRpower+correction, BLpower-correction, BRpower+correction);
-            idle();
+            voltage = VoltSens.getVoltage();
+
+            // Prevent division by zero or invalid voltage readings.
+            if (voltage <= 0) {
+                setDrivePower(0.0, 0.0, 0.0, 0.0);
+                return;
+            }
+
+            FLpower = (batteryConst * FLpower) / voltage;
+            FRpower = (batteryConst * FRpower) / voltage;
+            BLpower = (batteryConst * BLpower) / voltage;
+            BRpower = (batteryConst * BRpower) / voltage;
+
+            setDrivePower(FLpower, FRpower, BLpower, BRpower);
+
+            ElapsedTime driveTimer = new ElapsedTime();
+
+            // Safety timeout: stop if the requested movement takes too long.
+            double timeoutSeconds = 5.0 + Math.abs(inches) / 5.0;
+
+            while (opModeIsActive()
+                    && driveTimer.seconds() < timeoutSeconds) {
+
+                pinpoint.update();
+
+                boolean FLdone =
+                        Math.abs(frontLeftDrive.getCurrentPosition()) >= counts;
+
+                boolean FRdone =
+                        Math.abs(frontRightDrive.getCurrentPosition()) >= counts;
+
+                boolean BLdone =
+                        Math.abs(backLeftDrive.getCurrentPosition()) >= counts;
+
+                boolean BRdone =
+                        Math.abs(backRightDrive.getCurrentPosition()) >= counts;
+
+                // Finish once every wheel reaches its target.
+                if (FLdone && FRdone && BLdone && BRdone) {
+                    break;
+                }
+
+                correction = checkDirection();
+
+                setDrivePower(
+                        FLpower - correction,
+                        FRpower + correction,
+                        BLpower - correction,
+                        BRpower + correction
+                );
+
+                idle();
+            }
+
+            // Always stop the drive motors when the loop ends.
+            setDrivePower(0.0, 0.0, 0.0, 0.0);
+
+            runUsingEncoders();    // Stop all motors
         }
 
-        setDrivePower(noPower,noPower,noPower,noPower);       // Stop all motors
+
+        //***************************************************************************
+        // Functions for turning and checking robot angle for correction
+        //
+
+        /***************************************************/
+        /* Resets the cumulative angle tracking to zero.   */
+        /***************************************************/
+
+
+        /************************************************************/
+        /* Get current cumulative angle rotation from last reset.   */
+        /* @return Angle in degrees. + = left, - = right.           */
+        /************************************************************/
+
+        /**
+         * See if we are moving in a straight line and if not return a power correction value.
+         * @return Power adjustment, + is adjust left - is adjust right.
+         */
     }
-
-
-    //***************************************************************************
-    // Functions for turning and checking robot angle for correction
-    //
-
-    /***************************************************/
-    /* Resets the cumulative angle tracking to zero.   */
-    /***************************************************/
-    private void resetAngle()
-    {
-        imu.resetYaw();
-        lastAngles = imu.getRobotYawPitchRollAngles();
-
-        globalAngle = 0;
-    }
-
-    /************************************************************/
-    /* Get current cumulative angle rotation from last reset.   */
-    /* @return Angle in degrees. + = left, - = right.           */
-    /************************************************************/
-    private double getAngle()
-    {
-        // We experimentally determined the Z axis is the axis we want to use for heading angle.
-        // We have to process the angle because the imu works in euler angles so the Z axis is
-        // returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
-        // 180 degrees. We detect this transition and track the total cumulative angle of rotation.
-
-        // Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-
-        double deltaAngle = orientation.getYaw(AngleUnit.DEGREES) - lastAngles.getYaw(AngleUnit.DEGREES);
-
-        if (deltaAngle < -180)
-            deltaAngle += 360;
-        else if (deltaAngle > 180)
-            deltaAngle -= 360;
-
-        globalAngle += deltaAngle;
-
-        lastAngles = orientation;
-
-        return globalAngle;
-    }
-
-    /**
-     * See if we are moving in a straight line and if not return a power correction value.
-     * @return Power adjustment, + is adjust left - is adjust right.
-     */
-    private double checkDirection()
-    {
-        // The gain value determines how sensitive the correction is to direction changes.
-        // You will have to experiment with your robot to get small smooth direction changes
-        // to stay on a straight line.
-
-        //Orientation angles = imu.getRobotYawPitchRollAngles();
-        double currentHeading = imu.getRobotYawPitchRollAngles().getYaw();
-
-        // Calculate the error
-        double error = - currentHeading;
-
-        // Normalize the error to be within -180 to 180 degrees
-        if (error > 180) {
-            error -= 360;
-        } else if (error < -180) {
-            error += 360;
-        }
-
-        // Simple proportional control for correction
-        // Adjust the 'Kp' (proportional constant) as needed for your robot
-        double Kp = 0.02; // Example value, tune for your robot
-
-        double correction = error * Kp;
-
-        return correction;
-    }
-
     /**
      * Rotate left or right the number of degrees. Does not support turning more than 180 degrees.
      * @param degrees Degrees to turn, + is left - is right
      */
     private void rotate(int degrees, double power)
     {
-        double    leftPower, rightPower;
+        frontLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        // restart imu movement tracking.
-        resetAngle();
+        pinpoint.update();
 
-        // getAngle() returns + when rotating counter clockwise (left) and - when rotating
-        // clockwise (right).
-        if (degrees < 0)
-        {    // turn right.
-            leftPower = power;
-            rightPower = -power;
+        double targetHeading = normalizeHeading(pinpoint.getHeadingDegrees() + degrees
+        );
+
+        ElapsedTime rotateTimer = new ElapsedTime();
+        double timeoutSeconds = 5.0;
+
+        while (opModeIsActive()
+                && rotateTimer.seconds() < timeoutSeconds) {
+
+            pinpoint.update();
+
+            double currentHeading = normalizeHeading(
+                    pinpoint.getHeadingDegrees()
+            );
+
+            double error = normalizeHeading(
+                    targetHeading - currentHeading
+            );
+
+            // Stop when the robot is within 2 degrees of the target.
+            if (Math.abs(error) <= 2.0) {
+                break;
+            }
+
+            if (error > 0) {
+                // Positive error: turn left.
+                setDrivePower(-power, power, -power, power);
+            } else {
+                // Negative error: turn right.
+                setDrivePower(power, -power, power, -power);
+            }
+
+            telemetry.addData("Target Heading", "%.1f", targetHeading);
+            telemetry.addData("Current Heading", "%.1f", currentHeading);
+            telemetry.addData("Heading Error", "%.1f", error);
+            telemetry.update();
+
+            idle();
         }
-        else if (degrees > 0)
-        {    // turn left.
-            leftPower = -power;
-            rightPower = power;
-        }
-        else return;
 
-        // set power to rotate.
-        setDrivePower(leftPower,rightPower,leftPower,rightPower);
+        setDrivePower(0.0, 0.0, 0.0, 0.0);
 
-        // rotate until turn is completed.
-        if (degrees < 0)
-        {
-            // On right turn we have to get off zero first.
-            while (opModeIsActive() && getAngle() == 0) {}
+        runUsingEncoders();
 
-            while (opModeIsActive() && getAngle() > degrees) {}
-        }
-        else    // left turn.
-        {
-            while (opModeIsActive() && getAngle() < degrees) {}
-        }
-
-        // turn the motors off.
-        setDrivePower(noPower,noPower,noPower,noPower);
-
-        // wait for rotation to stop.
-        sleep(500);
-
-        // reset angle tracking on new heading.
-        resetAngle();
+        sleep(250);
     }
 
+
+
 }
+
