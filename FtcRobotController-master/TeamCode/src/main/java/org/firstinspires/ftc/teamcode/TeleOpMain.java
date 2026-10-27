@@ -186,7 +186,7 @@ public class TeleOpMain extends LinearOpMode {
 
     drive.init(hardwareMap);
 
-    ballAdjustment = new ServoClass(hardwareMap);
+
 
     // Variables to toggle the on/off of the fly wheel motors
     boolean motorOn = false;
@@ -309,10 +309,7 @@ public class TeleOpMain extends LinearOpMode {
               drive.getHeadingDegrees());
       telemetry.update();
 
-      if (gamepad1.a && !previousGamepad1A) {
-                ballAdjustment.togglePosition(); 
-            }
-            previousGamepad1A = gamepad1.a; // Updates the button history
+      // Updates the button history
       
         /* NormalizedRGBA ballColor = color.getNormalizedColors();
 
