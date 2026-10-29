@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
@@ -68,7 +69,8 @@ public class TeleOpMain extends LinearOpMode {
 
   FieldOrientatedDrive drive = new FieldOrientatedDrive();
 
-  IntakeSubsystem intake = new IntakeSubsystem(intakeMotor, 0.5);
+  private MotorsClass motors = new MotorsClass();
+
 
   // Drive Wheels
   // Create Drive Wheel motors
@@ -187,6 +189,8 @@ public class TeleOpMain extends LinearOpMode {
   public void runOpMode() {
 
     drive.init(hardwareMap);
+    motors.init(hardwareMap);
+
 
     // Variables to toggle the on/off of the fly wheel motors
     boolean motorOn = false;
@@ -298,7 +302,7 @@ public class TeleOpMain extends LinearOpMode {
     while (opModeIsActive())
     {
 
-      intake.handleIntake(gamepad1);
+      motors.handleIntake(gamepad1);
       telemetry.update();
       
       //establish FieldOrientatedDrive controls from java class
