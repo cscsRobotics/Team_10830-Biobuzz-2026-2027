@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.gamepad.Gamepad;
 
 // Blinkin
 
@@ -32,13 +33,22 @@ public class MotorsClass {
         // map motors for ball intake and ball sorter
         intakeMoto = hardwareMap.get(DcMotor.class,"intake");
        
-
-
         intakeMoto.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        //add more when needed
+
     }
-
-
+     public void handleIntake(Gamepad gamepad) {
+        if (gamepad.left_bumper) {
+            intakeMotor.setPower(1.0);
+        
+        } else if (gamepad.right_bumper) {
+            intakeMotor.setPower(-1.0);
+           
+        } else {
+            intakeMotor.setPower(0.0);
+        }
+    }
 }
