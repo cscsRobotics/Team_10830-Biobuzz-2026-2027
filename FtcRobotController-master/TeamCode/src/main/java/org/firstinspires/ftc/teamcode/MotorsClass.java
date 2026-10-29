@@ -31,20 +31,12 @@ public class MotorsClass {
 
         // map motors for ball intake and ball sorter
         intakeMoto = hardwareMap.get(DcMotor.class,"intake");
-        sorterMoto = hardwareMap.get(DcMotor.class,"Sorter");
+       
 
 
         intakeMoto.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        sorterMoto.setDirection(DcMotorSimple.Direction.FORWARD);
-        sorterMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-       // sorterMoto.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        sorterMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        sorterMoto.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        sorterMoto.setTargetPosition(0);
-
 
     }
 
