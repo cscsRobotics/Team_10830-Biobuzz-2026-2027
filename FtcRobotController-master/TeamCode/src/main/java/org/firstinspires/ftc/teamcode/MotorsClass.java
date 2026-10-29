@@ -45,10 +45,10 @@ public class MotorsClass {
             intakeMotor.setPower(0.0);
         
         } else if (gamepad.right_bumper) {
-            intakeMotor.setPower(-1.0);
+            intakeMotor.setPower(-0.5);
            
         } else if (gamepad.left_bumper){
-         intakeMotor.setPower(1.0);
+         intakeMotor.setPower(0.5);
 
         } else {
             intakeMotor.setPower(0.0);
