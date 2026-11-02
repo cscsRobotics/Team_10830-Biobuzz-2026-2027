@@ -109,7 +109,6 @@ public class AutoMainOld extends LinearOpMode {
 
 
     // This declares the IMU needed to get the current direction the robot is facing
-    private Orientation lastAngle = new Orientation();
 
     // Create color sensor
     private NormalizedColorSensor color;

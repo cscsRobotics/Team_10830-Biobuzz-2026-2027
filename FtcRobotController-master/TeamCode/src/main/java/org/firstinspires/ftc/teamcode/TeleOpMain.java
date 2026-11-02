@@ -48,7 +48,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGR
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+
 
 
 
@@ -236,6 +236,7 @@ public class TeleOpMain extends LinearOpMode {
 
       motors.handleIntake(gamepad1);
       motors.handleFlyWheel(gamepad1);
+      motors.pusherUpperMech(gamepad1);
       telemetry.update();
       
       //establish FieldOrientatedDrive controls from java class
