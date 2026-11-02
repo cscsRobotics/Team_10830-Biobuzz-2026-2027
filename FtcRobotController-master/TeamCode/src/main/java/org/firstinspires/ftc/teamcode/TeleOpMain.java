@@ -82,14 +82,8 @@ public class TeleOpMain extends LinearOpMode {
 
   // Create other motors
   //
-  private DcMotor intakeMoto;
-  private DcMotor sorterMoto;
 
   // Create all servos
-  private Servo pushBallFront;
-  private Servo pushBallBack;
-  private Servo lift;
-  private Servo flipper;
 
   // Create color sensor
   private NormalizedColorSensor color;
@@ -102,32 +96,6 @@ public class TeleOpMain extends LinearOpMode {
   private double reduceSpeed = 1.0;
 
   private static double powerConstant = .51;
-
-  // set lift servo down and up positions
-  // Larger number is down and small numbers raise lift higher
-  private static double liftDownPosition = 0.9;
-  private static double liftUpPosition = 0.53;
-
-  //set pushBallFront servo down and up positions
-  // note: closer to 1, the lower the height
-  private static double pushBallFUpPos = 0.5;
-  private static double pushBallFSortPos = 0.6;
-  private static double pushBallFDownPos = 1.0;
-
-  //set pushBallBack servo down and up positions
-  private static double pushBallBUpPos = 0.3;
-  private static double pushBallBDownPos = .6;
-  // set positions for flipper to shoot ball
-  private static double flipPositionInit = 0.0;
-  private static double flipPositionShoot = 0.7;
-
-  private static double sorterPowerSpeed = 0.4;
-  private static double sorterPowerSpeedIntake = 0.35;
-  private static double sorterPowerSpeedReset = 1.0;
-  private static int rotateSorterRotateDelay = 200;
-  private static double sorterPowerSpeedStop = 0.0;
-
-  private static int sorterIntakePos = 0;
 
   private ServoClass ballAdjustment; 
   private boolean previousGamepad1A = false; 
@@ -205,11 +173,6 @@ public class TeleOpMain extends LinearOpMode {
 
     // Mapped drive train wheels
 
-    // map motors for ball intake and ball sorter
-    //intakeMoto = hardwareMap.get(DcMotor.class,"intake");
-    //sorterMoto = hardwareMap.get(DcMotor.class,"Sorter");
-
-    // map fly wheels motors
     //flyWheelRightMoto = hardwareMap.get(DcMotorEx.class,"flyWheelRight");
     //flyWheelLeftMoto = hardwareMap.get(DcMotorEx.class,"flyWheelLeft");
 
@@ -225,12 +188,6 @@ public class TeleOpMain extends LinearOpMode {
 
     // set the target velocity for the flywheel
     // volocityController.setTargetVelocity(targetVelocity);
-
-    // map ALL servos
-    //lift = hardwareMap.servo.get("lift");
-    //pushBallFront = hardwareMap.servo.get("pushBall");
-    //pushBallBack = hardwareMap.servo.get("pushballback");
-    //flipper = hardwareMap.servo.get("flipper");
 
     // Blinkin - map LED lights
     //blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkinLed");
@@ -250,31 +207,6 @@ public class TeleOpMain extends LinearOpMode {
     // Set direction of all motors                       //
     //***************************************************//
 
-    //intakeMoto.setDirection(DcMotorSimple.Direction.REVERSE);
-    //intakeMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    //intakeMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-    //sorterMoto.setDirection(DcMotorSimple.Direction.FORWARD);
-    //sorterMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    //sorterMoto.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    //sorterMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    //sorterMoto.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    //sorterMoto.setTargetPosition(0);
-
-    //flyWheelRightMoto.setDirection(DcMotorSimple.Direction.FORWARD);
-    //flyWheelRightMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    //flyWheelRightMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-    //flyWheelLeftMoto.setDirection(DcMotorSimple.Direction.REVERSE);
-    //flyWheelLeftMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    //flyWheelLeftMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-    // Initialize the start positions and direction for servos
-    //lift.setDirection(Servo.Direction.REVERSE);
-    //lift.setPosition(liftDownPosition);
-    //pushBallFront.setPosition(pushBallFDownPos);
-    //pushBallBack.setPosition(pushBallBDownPos);
-    //flipper.setPosition(flipPositionInit);
 
 
 
@@ -303,6 +235,7 @@ public class TeleOpMain extends LinearOpMode {
     {
 
       motors.handleIntake(gamepad1);
+      motors.handleFlyWheel(gamepad1);
       telemetry.update();
       
       //establish FieldOrientatedDrive controls from java class
@@ -347,62 +280,33 @@ public class TeleOpMain extends LinearOpMode {
        if (gamepad1.a)
        {
 
-          //lifter goes up
-          lift.setPosition(liftUpPosition);
-
-          sleep(500);
-          pushBallBack.setPosition(pushBallBDownPos);
-          //flipper pushes to launcher
-          flipper.setPosition(flipPositionShoot);
-
-          sleep(250);
-
-          //flipper resets to init
-          flipper.setPosition(flipPositionInit);
-
-          //lifter comes down to init
-          lift.setPosition(liftDownPosition);
+         //nothing here
 
        }
 
       // push ball front flap up during intake
       if(gamepad1.dpad_up)
       {
-          pushBallFront.setPosition(pushBallFSortPos);
-          sleep(100);
-
-          sorterMoto.setPower(sorterPowerSpeedIntake);
-          sleep(rotateSorterRotateDelay);
-          sorterMoto.setPower(sorterPowerSpeedStop);
+         nothing here
 
       }
 
       // push ball front flap up sorting setting for rotating the balls
       if(gamepad1.dpad_right)
       {
-          pushBallFront.setPosition(pushBallFSortPos);
+
       }
 
       // reset pushball up front flap down to init state
       if(gamepad1.dpad_down)
       {
-          pushBallFront.setPosition(pushBallFDownPos);
+
       }
 
-        //intake spins inwards
+
        if(gamepad1.left_bumper)
        {
-          intakeMoto.setPower(1.0);
-          pushBallFront.setPosition(pushBallFDownPos);
-       }
-       else if (gamepad1.right_bumper)
-       {
-          intakeMoto.setPower(-1.0);
-          pushBallFront.setPosition(pushBallFDownPos);
-       }
-       else
-       {
-          intakeMoto.setPower(0.0);
+
 
        }
 
@@ -473,42 +377,14 @@ public class TeleOpMain extends LinearOpMode {
 
       // Sort ball clockwise
       if(gamepad1.y){
-        //sorterMoto.setPower(sorterPowerSpeed);
-
-        // delay request amout of time;
-        sleep(rotateSorterRotateDelay);
-
-        // stop sorter motor
-        // sorterMoto.setPower(sorterPowerSpeedStop);
-
+        //nothing here
       }
 
       // Sort ball counter clockwise
       if(gamepad1.x){
-        // sorterMoto.setPower(-sorterPowerSpeed);
-
-        //delay request amout of time;
-        sleep(rotateSorterRotateDelay);
-
-        // stop sorter motor
-        //sorterMoto.setPower(sorterPowerSpeedStop);
-
-
-
-        //sorterMoto.setPower(0);
+        //nothing here
       }
 
-      //Movement
-
-      /* driveFieldRelative(
-              -gamepad1.left_stick_y, //forward/back
-              gamepad1.left_stick_x,   //strafe
-              gamepad1.right_stick_x   // rotate
-      );
-
-      drive.driveFieldRelative(forward, strafe, rotate);
-
-        */
     }
 
   }
@@ -525,18 +401,18 @@ public class TeleOpMain extends LinearOpMode {
 //   right_stick_y = not used
 //
 //  Buttons
-//    a = lift ball and shootzzz
-//    x = sorter moves to 50 (first ball)
-//    y = sorter moves to 140 (second ball)
-//    left_bumper = intake motor on/off
-//    right_bumper = strafe right
-//    left_trigger = strafe left
-//    right_trigger = intake motor spin outtake
-//    back = sorter moves back to zero
-//    start = sorter moves thrid part
+//    a = shooting
+//    x = nothing here yet
+//    y = nothing here yet
+//    left_bumper = intake OUT
+//    right_bumper = intake IN
+//    left_trigger = nothing here yet
+//    right_trigger = nothing here yet
+//    back = nothing here yet
+//    start = nothing here yet
 //
 //  hat
-//    dpad_up = move flipper for intake up
-//    dpad_down = move flipper for intake all the way down
-//    dpad_right = move flipper for intake part way for sorting
+//    dpad_up = nothing here yet
+//    dpad_down = nothing here yet
+//    dpad_right = nothing here yet
 //    dpad_left = not used
