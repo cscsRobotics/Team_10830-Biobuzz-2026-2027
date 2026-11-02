@@ -14,6 +14,8 @@ public class MotorsClass {
     // Create motors and velocity controller for flywheels
     private DcMotorEx flyWheelMotor;
 
+    private DcMotor pusherUpper;
+
 
     public void init(HardwareMap hardwareMap) {
 
@@ -21,6 +23,8 @@ public class MotorsClass {
         intakeMotor = hardwareMap.get(DcMotor.class,"intake");
 
         flyWheelMotor = hardwareMap.get(DcMotorEx.class,"flyWheelMotor");
+
+        pusherUpper = hardwareMap.get(DcMotor.class, "pusherUpper");
 
        
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -31,7 +35,10 @@ public class MotorsClass {
         flyWheelMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         flyWheelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         flyWheelMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        flyWheelMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        pusherUpper.setDirection(DcMotorSimple.Direction.FORWARD);
+        pusherUpper.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        pusherUpper.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //add more when needed
 
     }
