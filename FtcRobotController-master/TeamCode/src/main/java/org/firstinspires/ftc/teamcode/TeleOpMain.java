@@ -235,7 +235,7 @@ public class TeleOpMain extends LinearOpMode {
     {
 
       motors.handleIntake(gamepad1);
-      //motors.handleFlyWheel(gamepad1); not using yet
+      motors.handleFlyWheel(gamepad1);
       motors.pusherUpperMech(gamepad1);
       telemetry.update();
       

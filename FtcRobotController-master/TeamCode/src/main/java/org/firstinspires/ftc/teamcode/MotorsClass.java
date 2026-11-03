@@ -22,7 +22,7 @@ public class MotorsClass {
         // map motors for ball intake and fly wheels
         intakeMotor = hardwareMap.get(DcMotor.class,"intake");
 
-        //flyWheelMotor = hardwareMap.get(DcMotorEx.class,"flyWheelMotor");
+        flyWheelMotor = hardwareMap.get(DcMotorEx.class,"flyWheelMotor");
 
         pusherUpper = hardwareMap.get(DcMotor.class, "pusherUpper");
 
@@ -32,9 +32,9 @@ public class MotorsClass {
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        //flyWheelMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        //flyWheelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //flyWheelMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flyWheelMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        flyWheelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        flyWheelMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         pusherUpper.setDirection(DcMotorSimple.Direction.REVERSE);
         pusherUpper.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -69,12 +69,12 @@ public class MotorsClass {
 
     }
 
-    /*public void handleFlyWheel(Gamepad gamepad) {
+    public void handleFlyWheel(Gamepad gamepad) {
         if (gamepad.a) {
             flyWheelMotor.setPower(0.85);
         } else {
             flyWheelMotor.setPower(0.0);
         }
-        } */
+        }
 
     }
