@@ -70,16 +70,6 @@ public class TeleOpMain extends LinearOpMode {
   FieldOrientatedDrive drive = new FieldOrientatedDrive();
 
   private MotorsClass motors = new MotorsClass();
-
-
-  // Drive Wheels
-  // Create Drive Wheel motors
-
-  // Create motors and velocity controller for flywheels
-  private DcMotorEx flyWheelRightMoto;
-  private DcMotorEx flyWheelLeftMoto;
-  // private PIDFController velocityController;
-
   // Create other motors
   //
 

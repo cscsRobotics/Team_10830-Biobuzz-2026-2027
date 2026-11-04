@@ -36,7 +36,7 @@ public class MotorsClass {
         flyWheelMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         flyWheelMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        pusherUpper.setDirection(DcMotorSimple.Direction.REVERSE);
+        pusherUpper.setDirection(DcMotorSimple.Direction.FORWARD);
         pusherUpper.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         pusherUpper.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         pusherUpper.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -62,6 +62,8 @@ public class MotorsClass {
     public void pusherUpperMech(Gamepad gamepad) {
         if (gamepad.y) {
             pusherUpper.setPower(1.0);
+        } else if (gamepad.x){
+            pusherUpper.setPower(-1.0);
         } else {
             pusherUpper.setPower(0.0);
         }
@@ -70,7 +72,8 @@ public class MotorsClass {
     }
 
     public void handleFlyWheel(Gamepad gamepad) {
-        if (gamepad.a) {
+        if (gamepad.a && !) {
+            //program toggle for this
             flyWheelMotor.setPower(0.85);
         } else {
             flyWheelMotor.setPower(0.0);
