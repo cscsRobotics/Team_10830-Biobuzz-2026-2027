@@ -7,12 +7,13 @@ public class FieldOrientatedDriveOpmode extends OpMode{
 
     double forward, strafe, rotate;
 
-    @Override
+
+
+
     public void init() {
         drive.init(hardwareMap);
     }
 
-    @Override
     public void loop() {
 
         forward = -gamepad1.left_stick_y;

@@ -16,6 +16,11 @@ public class MotorsClass {
 
     private DcMotor pusherUpper;
 
+    private boolean previousGamepad1a = false;
+
+    private boolean motorRunning = false;
+
+
 
     public void init(HardwareMap hardwareMap) {
 
@@ -26,7 +31,7 @@ public class MotorsClass {
 
         pusherUpper = hardwareMap.get(DcMotor.class, "pusherUpper");
 
-       
+
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -43,15 +48,15 @@ public class MotorsClass {
         //add more when needed
 
     }
-     public void handleIntake(Gamepad gamepad) {
+    public void handleIntake(Gamepad gamepad) {
         if (gamepad.right_bumper && gamepad.left_bumper) {
             intakeMotor.setPower(0.0);
-        
+
         } else if (gamepad.right_bumper) {
             intakeMotor.setPower(-0.65);
-           
+
         } else if (gamepad.left_bumper){
-         intakeMotor.setPower(0.65);
+            intakeMotor.setPower(0.65);
 
         } else {
             intakeMotor.setPower(0.0);
@@ -60,11 +65,12 @@ public class MotorsClass {
 
 
     public void pusherUpperMech(Gamepad gamepad) {
+        //check if gamepad.y is pressed
         if (gamepad.y) {
             pusherUpper.setPower(1.0);
-        } else if (gamepad.x){
+        } else if (gamepad.x){ //check if gamepad.x is pressed
             pusherUpper.setPower(-1.0);
-        } else {
+        } else {//if none pressed then set power to 0
             pusherUpper.setPower(0.0);
         }
 
@@ -72,12 +78,20 @@ public class MotorsClass {
     }
 
     public void handleFlyWheel(Gamepad gamepad) {
-        if (gamepad.a && !) {
-            //program toggle for this
-            flyWheelMotor.setPower(0.85);
+        // 1. Detect if the button was JUST pressed down
+        if (gamepad.a && !previousGamepad1a) {
+            motorRunning = !motorRunning;
+        }
+
+        // 2. ALWAYS update this variable, out of the 'if' statement
+        previousGamepad1a = gamepad.a;
+
+        // 3. Set the motor to full power (1.0) or off (0.0)
+        if (motorRunning) {
+            flyWheelMotor.setPower(1.0); // 1.0 means 100% power
         } else {
             flyWheelMotor.setPower(0.0);
         }
-        }
-
     }
+
+}
