@@ -87,14 +87,10 @@ import org.firstinspires.ftc.robotcore.external.ClassFactory;
 
 public class AutoMainOld extends LinearOpMode {
 
+    private AutoDrive autoDrive;
+
     // Drive Wheels
     // Create Drive Wheel motors
-
-    private PinpointOdometry pinpoint;
-    private DcMotor frontLeftDrive;
-    private DcMotor frontRightDrive;
-    private DcMotor backLeftDrive;
-    private DcMotor backRightDrive;
 
     // Create motors and velocity controller for flywheels
 
@@ -116,6 +112,7 @@ public class AutoMainOld extends LinearOpMode {
     // Create Limelight
     private Limelight3A limeLight;
 
+    /*
     private static int pipeLine21Red = 1;
     private static int pipeLine22Red = 2;
     private static int pipeLine23Red = 3;
@@ -124,7 +121,7 @@ public class AutoMainOld extends LinearOpMode {
     private static int pipeLine23Blue = 6;
     private static int pipeLine21 = 7;
     private static int pipeLine22 = 8;
-    private static int pipeLine23 = 9;
+    private static int pipeLine23 = 9; */
 
     private VoltageSensor VoltSens;
 
@@ -134,34 +131,26 @@ public class AutoMainOld extends LinearOpMode {
     /***************************/
     /* Possible Automous Modes */
     /***************************/
-    public enum AutoMode
+    public enum Park
     {
-        AUTO_MODE_NOT_SELECTED,
-        AUTO_MODE_BLUE_GOAL,
-        AUTO_MODE_BLUE_AUDIENCE,
-        AUTO_MODE_RED_GOAL,
-        AUTO_MODE_RED_AUDIENCE
+        PARK_PATTERN_NOT_SELECTED,
+        PARK_PATTERN_FRONTSTAGE,
+        PARK_PATTERN_BACKSTAGE,
     }
 
     /***************************/
     /* Possible Park Location  */
     /***************************/
-    public enum motifs
+    public enum parkLocation
     {
-        MOTIF_PATTERN_NOT_SELECTED,
-        MOTIF_PATTERN_PPG,           // Apriltag #23
-        MOTIF_PATTERN_PGP,           // Apriltag #22
-        MOTIF_PATTERN_GPP            // Apriltag #21
+        PARK_PATTERN_NOT_SELECTED,
+        PARK_PATTERN_FRONTSTAGE,           // Apriltag #23
+        PARK_PATTERN_BACKSTAGE,           // Apriltag #22
     }
 
     /**********************/
     /* Sorter Directions  */
     /**********************/
-    public enum sortDir
-    {
-        CLOCKWISE,
-        COUNTER_CLOCKWISE
-    }
 
     /***************************************/
     /* Variables for driving with Encoders */
@@ -190,10 +179,10 @@ public class AutoMainOld extends LinearOpMode {
     private static double motorSpeedRedAud = 0.92;
 
     // Blinkin LED Colors for Indication of detected Motifs
-    private RevBlinkinLedDriver.BlinkinPattern BasePattern = RevBlinkinLedDriver.BlinkinPattern.GOLD;
-    private RevBlinkinLedDriver.BlinkinPattern PPGmotif = RevBlinkinLedDriver.BlinkinPattern.VIOLET;
-    private RevBlinkinLedDriver.BlinkinPattern PGPmotif = RevBlinkinLedDriver.BlinkinPattern.BLUE;
-    private RevBlinkinLedDriver.BlinkinPattern GPPmotif = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+   // private RevBlinkinLedDriver.BlinkinPattern BasePattern = RevBlinkinLedDriver.BlinkinPattern.GOLD;
+    //private RevBlinkinLedDriver.BlinkinPattern PPGmotif = RevBlinkinLedDriver.BlinkinPattern.VIOLET;
+    //private RevBlinkinLedDriver.BlinkinPattern PGPmotif = RevBlinkinLedDriver.BlinkinPattern.BLUE;
+    //private RevBlinkinLedDriver.BlinkinPattern GPPmotif = RevBlinkinLedDriver.BlinkinPattern.GREEN;
 
 
     /*********************/
@@ -240,8 +229,8 @@ public class AutoMainOld extends LinearOpMode {
 
 
     // Global Variables to  Game Specific Information
-    AutoMode   autoMode = AutoMode.AUTO_MODE_NOT_SELECTED;         // store automous mode selected
-    motifs     motifPattern = motifs.MOTIF_PATTERN_NOT_SELECTED;  // store park location selected
+    Park  park = Park.PARK_PATTERN_NOT_SELECTED;         // store autonomous mode selected
+    parkLocation parkLocal = parkLocation.PARK_PATTERN_NOT_SELECTED;  // store park location selected
 
     /*******************************************************************************************/
     /*
@@ -258,42 +247,31 @@ public class AutoMainOld extends LinearOpMode {
     /*      y - Blue Audiance                                                                  */
     /*******************************************************************************************/
 
-    private AutoMode SelectAutoMode()
+    private Park SelectPark()
     {
-        AutoMode autoMode = AutoMode.AUTO_MODE_NOT_SELECTED;      // Local variable to store selected automous mode
+        Park park = Park.PARK_PATTERN_NOT_SELECTED;      // Local variable to store selected automous mode
 
         /*******************************************/
         /* Display automous mode not selected yet  */
         /*******************************************/
         telemetry.addData("AutoMode","Not Selected");
-        telemetry.addData("AutoMode","Select a - Red Goal");
-        telemetry.addData("AutoMode","Select b - Red Audiance");
-        telemetry.addData("AutoMode","Select x - Blue Goal");
-        telemetry.addData("AutoMode","Select y - Blue Audiance");
+        telemetry.addData("AutoMode","Select a - Park frontstage");
+        telemetry.addData("AutoMode","Select b - Park Backstage");
 
         telemetry.update();
 
         /*****************************************/
         /* Loop until automous mode is selected  */
         /*****************************************/
-        while (!isStopRequested() && autoMode == AutoMode.AUTO_MODE_NOT_SELECTED)  {
+        while (!isStopRequested() && park == park.PARK_PATTERN_NOT_SELECTED)  {
 
             if (gamepad1.a) {  // Red side away from audience/Blue side toward audience
-                autoMode = AutoMode.AUTO_MODE_RED_GOAL;
+                park = Park.PARK_PATTERN_FRONTSTAGE;
             }
 
             if (gamepad1.b) {  // Red side toward audience/Blue side away from audience
-                autoMode = AutoMode.AUTO_MODE_RED_AUDIENCE;
+               park = Park.PARK_PATTERN_BACKSTAGE;
             }
-
-            if (gamepad1.x) {  // Red side away from audience/Blue side toward audience
-                autoMode = AutoMode.AUTO_MODE_BLUE_GOAL;
-            }
-
-            if (gamepad1.y) {  // Red side toward audience/Blue side away from audience
-                autoMode = AutoMode.AUTO_MODE_BLUE_AUDIENCE;
-            }
-
             idle();
         }
 
@@ -301,15 +279,15 @@ public class AutoMainOld extends LinearOpMode {
         /* Display selected automous mode   */
         /************************************/
         // mode.setValue(autoMode.toString());
-        telemetry.addData("Automous Mode", autoMode.toString());
+        telemetry.addData("Automous Mode", park.toString());
         telemetry.update();
 
         // Wait for the user to release the button
-        while (!isStopRequested() && (gamepad1.a || gamepad1.b || gamepad1.x || gamepad1.y)) {
+        while (!isStopRequested() && (gamepad1.a || gamepad1.b)) {
             idle();
         }
 
-        return autoMode;
+        return park;
 
     } // end SelectAutoMode
 
@@ -409,38 +387,26 @@ public class AutoMainOld extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException
     {
+
+        autoDrive = new AutoDrive(this);
+        autoDrive.init(hardwareMap);
+
         double tgtPower = 0;
 
         //****************************************//
         // Map all robot hardware                 //
         //****************************************//
 
-        pinpoint = new PinpointOdometry(hardwareMap);
-        pinpoint.setPose(0.0, 0.0, 0.0);
-
-        telemetry.addLine("Pinpoint Odometry Initialized!");
-        telemetry.addLine("Keep robot still until start.");
-        telemetry.update();
-
-        // Mapped drive train wheels
-        frontLeftDrive = hardwareMap.get(DcMotor.class,"FLMoto");
-        frontRightDrive = hardwareMap.get(DcMotor.class,"FRMoto"); //Was BR
-        backLeftDrive = hardwareMap.get(DcMotor.class,"BLMoto");
-        backRightDrive = hardwareMap.get(DcMotor.class,"BRMoto"); //Was FR
-
-        // map motors for ball intake and ball sorter
-        intakeMoto = hardwareMap.get(DcMotor.class,"intake");
-
 
         //map sensor
-        color = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
-        color.setGain(10);  // increase sensitivity of the color sensor
+        //color = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
+        //color.setGain(10);  // increase sensitivity of the color sensor
 
         VoltSens = hardwareMap.voltageSensor.get("Control Hub");
 
         // Blinkin - map LED lights
-        blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkinLed");
-        blinkinLedDriver.setPattern(BasePattern);
+        //blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkinLed");
+        //blinkinLedDriver.setPattern(BasePattern);
 
         /* The next two lines define Hub orientation.
          * The Default Orientation (shown) is when a hub is mounted horizontally with the printed logo pointing UP and the USB port pointing FORWARD.
@@ -453,36 +419,7 @@ public class AutoMainOld extends LinearOpMode {
 
 
         // Map LimeLight
-        limeLight = hardwareMap.get(Limelight3A.class, "limelight");
-
-
-        //***************************************************//
-        // Set direction of all motors                       //
-        //***************************************************//
-        frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        frontRightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-        frontRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        backLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        backRightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-        backRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        intakeMoto.setDirection(DcMotorSimple.Direction.REVERSE);
-        intakeMoto.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        intakeMoto.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+        //limeLight = hardwareMap.get(Limelight3A.class, "limelight");
 
         // Create local variable to store selected automous mode
         // and amount of delay time
@@ -495,7 +432,7 @@ public class AutoMainOld extends LinearOpMode {
         /*********************************************/
         /* Select Automous Mode, and Delay time      */
         /*********************************************/
-        autoMode = SelectAutoMode();
+        park = SelectPark();
         delayTimeMilliseconds = SelectDelayTime();
 
         // limeLight.start();
@@ -523,9 +460,7 @@ public class AutoMainOld extends LinearOpMode {
          * The limeLight will drain the battery so since this is auto, we should start the limeLight after
          * the start button pressed.  If limeLight slow to start then will need to move start.
          */
-        limeLight.start();
-
-        resetEncoders();
+        //limeLight.start();
 
         // Delay start if needed
         if (delayTimeMilliseconds > 0) {
@@ -538,26 +473,24 @@ public class AutoMainOld extends LinearOpMode {
             telemetry.update();
         }
 
-        telemetry.clearAll();               // clear display messages
+        telemetry.clearAll();// clear display messages
 
-        switch (autoMode) {
-            case AUTO_MODE_RED_GOAL:
-                RedGoal();
+        autoDrive.driveForward(4.0, halfPower);
+
+        switch (park) {
+            case PARK_PATTERN_FRONTSTAGE:
+
+                autoDrive.strafeRight(5.0, halfPower);
+
                 break;
 
-            case AUTO_MODE_BLUE_GOAL:
-                BlueGoal();
+            case PARK_PATTERN_BACKSTAGE:
+
+                autoDrive.strafeLeft(5.0, halfPower);
+
                 break;
 
-            case AUTO_MODE_RED_AUDIENCE:
-                RedAudience();
-                break;
-
-            case AUTO_MODE_BLUE_AUDIENCE:
-                BlueAudience();
-                break;
-
-            case AUTO_MODE_NOT_SELECTED:
+            case PARK_PATTERN_NOT_SELECTED:
                 // This one should not happen if it does do nothing
                 break;
         }
@@ -565,178 +498,7 @@ public class AutoMainOld extends LinearOpMode {
 
     }
 
-    /***************************************************************************/
-    /* Function: Red Goal                                                      */
-    /* Returns: none                                                           */
-    /* Uses Global Variables: motifPattern                                     */
-    /*                                                                         */
-    /* This function is for when the robot is on the red alliance and starts   */
-    /* in the goal location                                                    */
-    /*                                                                         */
-    /* The robot will be preloaded with a purple ball in the shooting positon  */
-    /* and the green ball to the left and the other purple ball to the right.  */
-    /* The limeLight will read the motif pattern which will be stored in a     */
-    /* global variable.  Based on the pattern, the balls will be sorted,       */
-    /* shot and the robot moved out of the shooting zone                       */
-    /***************************************************************************/
-    private void RedGoal() {
-
-        // strafe to the left to read obsilk
-        strafeLeft(60.0, halfPower);
-        sleep(500);
-
-        driveBackward(25.0, halfPower);
-        sleep(250);
-
-        // rotate to face goal
-        rotate(16, halfPower);
-
-        sleep(500);
-
-        // determine pattern of the ball
-        motifPattern = getMotif();
-
-        // rotate to face goal
-        rotate(-75, halfPower);
-
-
-        // Shoot the balls based off of the motife read at the start of auto
-        shootAllBalls(motorSpeedBlueGoal);
-
-        // Drive to move off of line
-        driveForward(5.0, halfPower);
-
-    }  // End of RedGoal()
-
-
-    /***************************************************************************/
-    /* Function: Blue Goal                                                      */
-    /* Returns: none                                                           */
-    /* Uses Global Variables: motifPattern                                     */
-    /*                                                                         */
-    /* This function is for when the robot is on the blue alliance and starts   */
-    /* in the goal location                                                    */
-    /*                                                                         */
-    /* The robot will be preloaded with a purple ball in the shooting positon  */
-    /* and the green ball to the left and the other purple ball to the right.  */
-    /* The limeLight will read the motif pattern which will be stored in a     */
-    /* global variable.  Based on the pattern, the balls will be sorted,       */
-    /* shot and the robot moved out of the shooting zone                       */
-    /***************************************************************************/
-    private void BlueGoal() {
-
-        // strafe to the right to read obsilk
-        strafeRight(60.0, halfPower);
-        sleep(500);
-
-        driveBackward(25.0, halfPower);
-        sleep(250);
-
-        // rotate to face goal
-        rotate(-16, halfPower);
-
-        sleep(500);
-
-        // determine pattern of the ball
-        motifPattern = getMotif();
-
-        // rotate to face goal
-        rotate(70, halfPower);
-
-
-        // Shoot the balls based off of the motife read at the start of auto
-        shootAllBalls(motorSpeedBlueGoal);
-
-        // Drive to move off of line
-        driveForward(5.0, halfPower);
-
-    }  // End of BlueGoal()
-
-
-    /***************************************************************************/
-    /* Function: Blue Audience                                                  */
-    /* Returns: none                                                           */
-    /* Uses Global Variables: motifPattern                                     */
-    /*                                                                         */
-    /* This function is for when the robot is on the red alliance and starts   */
-    /* in the shooting zone by the audiance                                    */
-    /*                                                                         */
-    /* The robot will be preloaded with a purple ball in the shooting positon  */
-    /* and the green ball to the left and the other purple ball to the right.  */
-    /* The limeLight will read the motif pattern which will be stored in a     */
-    /* global variable.  Based on the pattern, the balls will be sorted,       */
-    /* shot and the robot moved out of the shooting zone                       */
-    /***************************************************************************/
-    private void BlueAudience() {
-        //time for limelight to start
-        sleep(1000);
-
-        // determine pattern of the ball
-        motifPattern = getMotif();
-
-        driveForward(12.0, 0.15);
-        sleep(100);
-
-        // rotate to face goal
-        rotate(14, halfPower);
-
-        // Shoot the balls based off of the motife read at the start of auto
-        shootAllBalls(motorSpeedBlueAud);
-
-        // Drive to move off of line
-        driveForward(18.0, 0.2);
-
-    } // End of BlueAudiance()
-
-    /***************************************************************************/
-    /* Function: Red Audiance                                                  */
-    /* Returns: none                                                           */
-    /* Uses Global Variables: motifPattern                                     */
-    /*                                                                         */
-    /* This function is for when the robot is on the red alliance and starts   */
-    /* in the shooting zone by the audiance                                    */
-    /*                                                                         */
-    /* The robot will be preloaded with a purple ball in the shooting positon  */
-    /* and the green ball to the left and the other purple ball to the right.  */
-    /* The limeLight will read the motif pattern which will be stored in a     */
-    /* global variable.  Based on the pattern, the balls will be sorted,       */
-    /* shot and the robot moved out of the shooting zone                       */
-    /***************************************************************************/
-    private void RedAudience() {
-        //time for limelight to start
-        sleep(1000);
-
-        // determine pattern of the ball
-        motifPattern = getMotif();
-
-        driveForward(12.0, 0.15);
-        sleep(100);
-
-        // rotate to face goal
-        rotate(-15, halfPower);
-
-        // Shoot the balls based off of the motife read at the start of auto
-        shootAllBalls(motorSpeedRedAud);
-
-        // Drive to move off of line
-        driveForward(15.0, halfPower);
-
-    } // End of RedAudiance()
-
-
-
-    /************************************************************/
-    /* Function: getMotif                                       */
-    /* Returns: motif Pattern                                   */
-    /*                                                          */
-    /*          MOTIF_PATTERN_PPG,       // Apriltag #23        */
-    /*          MOTIF_PATTERN_PGP,       // Apriltag #22        */
-    /*          MOTIF_PATTERN_GPP        // Apriltag #21        */
-    /*                                                          */
-    /* This function is called to determine the motif patter    */
-    /* for shooting the balls.                                  */
-    /*                                                          */
-    /************************************************************/
+/*
     private motifs getMotif() {
 
         boolean targetFound = false;
@@ -891,471 +653,7 @@ public class AutoMainOld extends LinearOpMode {
 
         return motifPattern;
     }
-
-    /************************************************************/
-    /* Function: checkTarget                                    */
-    /* Returns: motif Pattern                                   */
-    /*                                                          */
-    /*          MOTIF_PATTERN_PPG,       // Apriltag #23        */
-    /*          MOTIF_PATTERN_PGP,       // Apriltag #22        */
-    /*          MOTIF_PATTERN_GPP        // Apriltag #21        */
-    /*                                                          */
-    /* This function is called to determine if the target is    */
-    /* detected and will return true or false                   */
-    /*                                                          */
-    /************************************************************/
-    private boolean checkTarget() {
-
-        LLResult latestResult = limeLight.getLatestResult();
-
-        // telemetry.addData("Pointer Null", latestResult);
-        // telemetry.addData("Results Valid", latestResult.isValid());
-        // telemetry.update();
-
-        if (latestResult != null && latestResult.isValid()) {
-            return true;
-        }
-        else
-        {
-            return false;
-
-        }
-    }
-
-    /************************************************************/
-    /* Function: shootAllBalls                                  */
-    /* Global: motifPattern                                     */
-    /* Returns: none                                            */
-    /*                                                          */
-    /*          MOTIF_PATTERN_NOT_SELECTED  - Default to 23     */
-    /*          MOTIF_PATTERN_PPG,          - Apriltag #23      */
-    /*          MOTIF_PATTERN_PGP,          - Apriltag #22      */
-    /*          MOTIF_PATTERN_GPP           - Apriltag #21      */
-    /*                                                          */
-    /* This function is called to shoot the balls based off of  */
-    /* the motif pattern.                                       */
-    /*                                                          */
-    /* Note: the preloaded balls should be purple at the back   */
-    /* purple to the right and green to the left                */
-    /*                                                          */
-    /************************************************************/
-
-    void shootAllBalls(double flyWheelPower) {
-
-        // start flywheels
-
-
-        sleep(250);
-
-        switch (motifPattern) {
-
-            case  MOTIF_PATTERN_NOT_SELECTED:
-            case  MOTIF_PATTERN_PPG:
-
-                // shoot first purple ball
-                shootOneBall();
-
-                // rotate to shoot second purple ball
-                rotateSorter(sortDir.CLOCKWISE, 660);
-                sleep(250);
-
-                // shoot second purple ball
-                shootOneBall();
-
-                // rotate to shoot green ball
-                rotateSorter(sortDir.CLOCKWISE, 650);
-                sleep(300);
-
-                // shoot green ball
-                shootOneBall();
-
-                // turn off flywheels
-
-
-                break;
-
-            case  MOTIF_PATTERN_PGP:
-
-                // shoot first purple ball
-                shootOneBall();
-
-                // rotate to shoot green ball
-                rotateSorter(sortDir.COUNTER_CLOCKWISE,800);
-                sleep(260);
-
-                // shoot green ball
-                shootOneBall();
-
-                // rotate to shoot second purple ball
-                rotateSorter(sortDir.COUNTER_CLOCKWISE,645);
-                sleep(260);
-
-                // shoot second purple ball
-                shootOneBall();
-
-                // turn off fly wheels
-
-
-                break;
-
-            case  MOTIF_PATTERN_GPP:
-
-                // rotate to shoot second purple ball
-                rotateSorter(sortDir.COUNTER_CLOCKWISE, 690);
-                sleep(250);
-
-                // shoot green ball
-                shootOneBall();
-
-                // rotate to shoot first ball
-                rotateSorter(sortDir.COUNTER_CLOCKWISE, 670);
-                sleep(250);
-
-                // shoot first purple ball
-                shootOneBall();
-
-                // rotate to shoot second purple ball
-                rotateSorter(sortDir.COUNTER_CLOCKWISE, 640);
-                sleep(250);
-
-                // shoot second purple ball
-                shootOneBall();
-
-                // turn off fly wheels
-
-
-                break;
-
-        }
-
-    }  // end shootAllBalls
-
-    /************************************************************/
-    /* Function: shootOneBalls                                  */
-    /* Global: none                                             */
-    /* Returns: none                                            */
-    /*                                                          */
-    /*          MOTIF_PATTERN_NOT_SELECTED  - Default to 23     */
-    /*          MOTIF_PATTERN_PPG,          - Apriltag #23      */
-    /*          MOTIF_PATTERN_PGP,          - Apriltag #22      */
-    /*          MOTIF_PATTERN_GPP           - Apriltag #21      */
-    /*                                                          */
-    /* This function is called to shoot one ball                */
-    /*                                                          */
-    /*                                                          */
-    /************************************************************/
-
-    void shootOneBall() {
-
-        //lifter goes up to push ball up
-
-
-        sleep(500);
-
-        //flipper pushes to launcher
-
-
-        sleep(250);
-
-        //flipper resets to init
-        sleep (200);
-
-        //lifter comes down to init
-
-        sleep (200);
-
-    } // end shootOneBall
-
-    /************************************************************/
-    /* Function: rotateSorter                                   */
-    /* Global: none                                             */
-    /* Returns: none                                            */
-    /*                                                          */
-    /* This function is called to rotate the sorter a given     */
-    /* amount of time                                           */
-    /*                                                          */
-    /************************************************************/
-    void rotateSorter(sortDir direction, int delay) {
-
-        //sorterMoto.setTargetPosition(postition);
-        //sorterMoto.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        if (direction == sortDir.CLOCKWISE) {
-
-        }
-        else {
-
-        }
-
-        sleep(delay);
-
-        //while(opModeIsActive() && sorterMoto.isBusy()) {
-        //    ;
-        //}
-
-        // stop sorter motor
-
-
-    }
-
-
-
-    //**************************************************************
-    // Functions needed for driving auto
-    //
-
-    private void resetEncoders()
-    {
-        frontRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    }
-
-    private void runUsingEncoders()
-    {
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
-    private void setDrivePower(double FLpower,double FRpower, Double BLpower, Double BRpower)
-    {
-        frontRightDrive.setPower(FRpower);
-        backRightDrive.setPower(BRpower);
-        frontLeftDrive.setPower(FLpower);
-        backLeftDrive.setPower(BLpower);
-    }
-
-    private double checkDirection () {
-        pinpoint.update();
-
-        double currentHeading = pinpoint.getHeadingDegrees();
-        double error = normalizeHeading(-currentHeading);
-
-        double Kp = 0.015;
-
-        return error * Kp;
-    }
-    /************************************************************/
-    /* Function: strafeRight                                    */
-    /* Returns: nothing                                         */
-    /*                                                          */
-    /* This function is called to have the robot move sideways  */
-    /* in a right direction                                     */
-    /************************************************************/
-    private void strafeRight(Double inches,Double power)
-    {
-        driveInches(inches*strafeFactor, power, -power, -power, power);
-
-    }
-
-    /************************************************************/
-    /* Function: strafeLeft                                     */
-    /* Returns: nothing                                         */
-    /*                                                          */
-    /* This function is called to have the robot move sideways  */
-    /* in a left  direction                                     */
-    /************************************************************/
-    private void strafeLeft(Double inches,Double power)
-    {
-        driveInches(inches*strafeFactor, -power, power, power, -power);
-    }
-
-    /************************************************************/
-    /* Function: driveForward                                   */
-    /* Returns: nothing                                         */
-    /*                                                          */
-    /* This function is called to have the robot move forward.  */
-    /* The robot speed is passed in and that value is used for  */
-    /* all wheels.                                              */
-    /************************************************************/
-    private void driveForward(Double inches,Double power)
-    {
-        driveInches(inches, power, power, power, power);
-    }
-
-    /***************************************************************/
-    /* Function: driveBackward                                     */
-    /* Returns: nothing                                            */
-    /*                                                             */
-    /* This function is called to have the robot move in reverse.  */
-    /* The robot speed is passed in and that value is used for     */
-    /* all wheels.                                                 */
-    /***************************************************************/
-    private void driveBackward(Double inches,Double power)
-    {
-        driveInches(inches, -power, -power, -power, -power);
-    }
-
-    private double normalizeHeading(double angle) {
-        while (angle > 180.0) {
-            angle -= 360.0;
-        }
-        while (angle <= -180.0) {
-            angle += 360.0;
-        }
-        return angle;
-    }
-    /************************************************************/
-    /*                                                          */
-    /* Function: driveInches                                    */
-    /* Returns: nothing                                         */
-    /*                                                          */
-    /* This function is called to have the robot move straigh   */
-    /* in a forward or reverse direction.                       */
-    /*                                                          */
-    /* Strafe Forward = negative front wheels, positive back    */
-    /* wheels                                                   */
-    /************************************************************/
-    private void driveInches(Double inches,Double FLpower,Double FRpower, Double BLpower, Double BRpower) {
-        {
-
-            double counts = Math.abs(inches * countsPerInch);
-
-            resetEncoders();
-            runUsingEncoders();
-
-            voltage = VoltSens.getVoltage();
-
-            // Prevent division by zero or invalid voltage readings.
-            if (voltage <= 0) {
-                setDrivePower(0.0, 0.0, 0.0, 0.0);
-                return;
-            }
-
-            FLpower = (batteryConst * FLpower) / voltage;
-            FRpower = (batteryConst * FRpower) / voltage;
-            BLpower = (batteryConst * BLpower) / voltage;
-            BRpower = (batteryConst * BRpower) / voltage;
-
-            setDrivePower(FLpower, FRpower, BLpower, BRpower);
-
-            ElapsedTime driveTimer = new ElapsedTime();
-
-            // Safety timeout: stop if the requested movement takes too long.
-            double timeoutSeconds = 5.0 + Math.abs(inches) / 5.0;
-
-            while (opModeIsActive()
-                    && driveTimer.seconds() < timeoutSeconds) {
-
-                pinpoint.update();
-
-                boolean FLdone =
-                        Math.abs(frontLeftDrive.getCurrentPosition()) >= counts;
-
-                boolean FRdone =
-                        Math.abs(frontRightDrive.getCurrentPosition()) >= counts;
-
-                boolean BLdone =
-                        Math.abs(backLeftDrive.getCurrentPosition()) >= counts;
-
-                boolean BRdone =
-                        Math.abs(backRightDrive.getCurrentPosition()) >= counts;
-
-                // Finish once every wheel reaches its target.
-                if (FLdone && FRdone && BLdone && BRdone) {
-                    break;
-                }
-
-                correction = checkDirection();
-
-                setDrivePower(
-                        FLpower - correction,
-                        FRpower + correction,
-                        BLpower - correction,
-                        BRpower + correction
-                );
-
-                idle();
-            }
-
-            // Always stop the drive motors when the loop ends.
-            setDrivePower(0.0, 0.0, 0.0, 0.0);
-
-            runUsingEncoders();    // Stop all motors
-        }
-
-
-        //***************************************************************************
-        // Functions for turning and checking robot angle for correction
-        //
-
-        /***************************************************/
-        /* Resets the cumulative angle tracking to zero.   */
-        /***************************************************/
-
-
-        /************************************************************/
-        /* Get current cumulative angle rotation from last reset.   */
-        /* @return Angle in degrees. + = left, - = right.           */
-        /************************************************************/
-
-        /**
-         * See if we are moving in a straight line and if not return a power correction value.
-         * @return Power adjustment, + is adjust left - is adjust right.
-         */
-    }
-    /**
-     * Rotate left or right the number of degrees. Does not support turning more than 180 degrees.
-     * @param degrees Degrees to turn, + is left - is right
-     */
-    private void rotate(int degrees, double power)
-    {
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        pinpoint.update();
-
-        double targetHeading = normalizeHeading(pinpoint.getHeadingDegrees() + degrees
-        );
-
-        ElapsedTime rotateTimer = new ElapsedTime();
-        double timeoutSeconds = 5.0;
-
-        while (opModeIsActive()
-                && rotateTimer.seconds() < timeoutSeconds) {
-
-            pinpoint.update();
-
-            double currentHeading = normalizeHeading(
-                    pinpoint.getHeadingDegrees()
-            );
-
-            double error = normalizeHeading(
-                    targetHeading - currentHeading
-            );
-
-            // Stop when the robot is within 2 degrees of the target.
-            if (Math.abs(error) <= 2.0) {
-                break;
-            }
-
-            if (error > 0) {
-                // Positive error: turn left.
-                setDrivePower(-power, power, -power, power);
-            } else {
-                // Negative error: turn right.
-                setDrivePower(power, -power, power, -power);
-            }
-
-            telemetry.addData("Target Heading", "%.1f", targetHeading);
-            telemetry.addData("Current Heading", "%.1f", currentHeading);
-            telemetry.addData("Heading Error", "%.1f", error);
-            telemetry.update();
-
-            idle();
-        }
-
-        setDrivePower(0.0, 0.0, 0.0, 0.0);
-
-        runUsingEncoders();
-
-        sleep(250);
-    }
+*/
 
 
 
