@@ -68,6 +68,7 @@ import java.util.List;
 public class TeleOpMain extends LinearOpMode {
 
   FieldOrientatedDrive drive = new FieldOrientatedDrive();
+  //tankdrive commented out
   //private TankDrive tankDrive = new TankDrive();
 
   private MotorsClass motors = new MotorsClass();
@@ -88,8 +89,8 @@ public class TeleOpMain extends LinearOpMode {
 
   private static double powerConstant = .51;
 
-  private ServoClass ballAdjustment; 
-  private boolean previousGamepad1A = false; 
+  private ServoClass ballAdjustment;
+  private boolean previousGamepad1A = false;
 
 
   // check for color ball - norm colors for green and red RBG
@@ -155,8 +156,6 @@ public class TeleOpMain extends LinearOpMode {
     // Variables to toggle the on/off of the fly wheel motors
     boolean motorOn = false;
     boolean lastMotorState = false;
-    int currentSorterPos = 0;
-
 
 
     //****************************************//
@@ -164,9 +163,6 @@ public class TeleOpMain extends LinearOpMode {
     //****************************************//
 
     // Mapped drive train wheels
-
-    //flyWheelRightMoto = hardwareMap.get(DcMotorEx.class,"flyWheelRight");
-    //flyWheelLeftMoto = hardwareMap.get(DcMotorEx.class,"flyWheelLeft");
 
     //color = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
     //color.setGain(3);  // increase sensitivity of the color sensor
@@ -188,7 +184,6 @@ public class TeleOpMain extends LinearOpMode {
     // Map LimeLight
     //limeLight = hardwareMap.get(Limelight3A.class, "limelight");
     //limeLight.pipelineSwitch(pipeLineGoalTags); // need to setup pipeline for april tags
-
 
 
     //*****************************************//
@@ -223,19 +218,20 @@ public class TeleOpMain extends LinearOpMode {
     //******************************************//
     // Run code while op mode is active         //
     //******************************************//
-    while (opModeIsActive())
-    {
+    while (opModeIsActive()) {
 
       motors.handleIntake(gamepad1);
       motors.handleFlyWheel(gamepad1);
       motors.pusherUpperMech(gamepad1);
       telemetry.update();
 
+      //tankDrive commented out
+
       //double leftPower = -gamepad1.left_stick_y;
       //double rightPower = -gamepad1.right_stick_y;
 
-
       //tankDrive.tankDrive(leftPower, rightPower);
+
       //establish FieldOrientatedDrive controls from java class
       double forward = -gamepad1.left_stick_y;
       double strafe = gamepad1.left_stick_x;
@@ -243,12 +239,13 @@ public class TeleOpMain extends LinearOpMode {
 
       drive.driveFieldRelative(forward, strafe, rotate);
 
-     // telemetry.addData("IMU Heading (degrees)", "%.1f",
-            // drive.odometry.getHeadingDegrees());
 
-      //telemetry.addData("Heading", drive.getHeadingDegrees());
-      //telemetry.update();
-      //telemetry.update();
+      // Display Pinpoint Odometry telemetry
+      telemetry.addData("Heading (deg)", "%.1f", drive.getOdometry().getHeadingDegrees());
+      telemetry.addData("X Position (in)", "%.1f", drive.getOdometry().getXInches());
+      telemetry.addData("Y Position (in)", "%.1f", drive.getOdometry().getYInches());
+      telemetry.update();
+      telemetry.update();
 
       // Updates the button history
       
@@ -331,64 +328,14 @@ public class TeleOpMain extends LinearOpMode {
       lastMotorState = currentMotorState;
 
       // control the motor based on the toggle state
-      if(motorOn){
+      if (motorOn) {
 
-        //LLResult lastResult = limeLight.getLatestResult();
 
-          /* if (lastResult != null && lastResult.isValid()) {
-
-             double targetArea = lastResult.getTa();
-
-             telemetry.clearAll();
-
-             telemetry.addData("Target Area",targetArea );
-             telemetry.update();
-
-             if (targetArea > 3.5){
-               wheelPower = 0.90;
-             }
-             else if ((targetArea > 2.0) && (targetArea < 3.5  )){
-               wheelPower = 0.7;
-             }
-             else if (targetArea < 2.0 && targetArea > 0.90){
-               wheelPower = 0.75;
-             }
-             else {
-               wheelPower = 0.90;
-             }
-
-             telemetry.clearAll();
-
-             telemetry.addData("Target Area", targetArea );
-             telemetry.addData("Wheel Speed", wheelPower );
-            telemetry.update();
-          }
-          else{
-            wheelPower = .85;
-          } */
-
-        // turn on fly wheels           telemetry.clearAll();
-        //flyWheelRightMoto.setPower(wheelPower);
-        //flyWheelLeftMoto.setPower(wheelPower);
-      }
-      else {
-        //flyWheelRightMoto.setPower(0.0);
-        //flyWheelLeftMoto.setPower(0.0);
-      }
-
-      // Sort ball clockwise
-      if(gamepad1.y){
-        //nothing here
-      }
-
-      // Sort ball counter clockwise
-      if(gamepad1.x){
-        //nothing here
       }
 
     }
-
   }
+
 }
 
 //***********************************************************
@@ -403,7 +350,8 @@ public class TeleOpMain extends LinearOpMode {
 //
 //  Buttons
 //    a = shooting
-//    x = nothing here yet
+//    b = nothing here yet
+//    x = pusher upper reverse
 //    y = pusher upper
 //    left_bumper = intake OUT
 //    right_bumper = intake IN
