@@ -106,12 +106,14 @@ public class AutoDrive {
 
     private static final double batteryConst = 13.5;
 
-    private static final Double wheelCircumference = 4.0 * Math.PI;
+    private static final Double wheelCircumference = 4.09 * Math.PI;
     private static final Double gearRatio = 18.9;                  // Rev HD Hex 20:1
     private static final Double countsPerRotation = 560.0;         // Rev HD Hex 20:1
-    private static final Double scaleFactor = 17.0;                 // need to find scale factor!!!
-    private static final Double strafeFactor = 1.0;
-    private static final Double countsPerInch = countsPerRotation / wheelCircumference / gearRatio * scaleFactor;
+    //private static final Double scaleFactor = 1.0;                 // need to find scale factor!!!
+    //private static final Double strafeFactor = 1.0;
+    //private static final Double countsPerInch = countsPerRotation / wheelCircumference / gearRatio;
+
+    private static final Double countsPerInch = (countsPerRotation * gearRatio) / wheelCircumference;
 
 
     public AutoDrive(LinearOpMode opMode) {
@@ -134,10 +136,11 @@ public class AutoDrive {
         pinpoint.setOffsets(-185.0,-133.0, DistanceUnit.MM);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        pinpoint.recalibrateIMU();
 
         //odometry starting position
         pinpoint.resetPosAndIMU();
-        Pose2D startingPosition = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
+        Pose2D startingPosition = new Pose2D(DistanceUnit.MM, 0, 0, AngleUnit.DEGREES, 0);
         //fix starting position for pinpoint for TeleOp and Autonomous modes to ensure accurate readings of the computer
         pinpoint.setPosition(startingPosition);
 
@@ -214,7 +217,7 @@ public class AutoDrive {
     /************************************************************/
     public void strafeRight(Double inches,Double power)
     {
-        driveInches(inches*strafeFactor, power, -power, -power, power);
+        driveInches(inches, power, -power, -power, power);
 
     }
 
@@ -227,7 +230,7 @@ public class AutoDrive {
     /************************************************************/
     public void strafeLeft(Double inches,Double power)
     {
-        driveInches(inches*strafeFactor, -power, power, power, -power);
+        driveInches(inches, -power, power, power, -power);
     }
 
     /************************************************************/
@@ -293,10 +296,10 @@ public class AutoDrive {
                 return;
             }
 
-        FLpower = Range.clip(batteryConst * FLpower / voltage, -1.0, 1.0);
-        FRpower = Range.clip(batteryConst * FRpower / voltage, -1.0, 1.0);
-        BLpower = Range.clip(batteryConst * BLpower / voltage, -1.0, 1.0);
-        BRpower = Range.clip(batteryConst * BRpower / voltage, -1.0, 1.0);
+        FLpower = ((batteryConst*FLpower)/voltage);
+        FRpower = ((batteryConst*FRpower)/voltage);
+        BLpower = ((batteryConst*BLpower)/voltage);
+        BRpower = ((batteryConst*BRpower)/voltage);
 
             ElapsedTime driveTimer = new ElapsedTime();
 
@@ -327,12 +330,7 @@ public class AutoDrive {
 
                 double correction = checkDirection();
 
-                setDrivePower(
-                        Range.clip(FLpower - correction, -1.0, 1.0),
-                        Range.clip(FRpower + correction, -1.0, 1.0),
-                        Range.clip(BLpower - correction, -1.0, 1.0),
-                        Range.clip(BRpower + correction, -1.0, 1.0)
-                );
+                setDrivePower(FLpower-correction, FRpower+correction, BLpower-correction, BRpower+correction);
 
                 opMode.idle();
             }

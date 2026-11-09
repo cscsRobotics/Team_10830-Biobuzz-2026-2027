@@ -475,18 +475,63 @@ public class AutoMainOld extends LinearOpMode {
 
         telemetry.clearAll();// clear display messages
 
-        autoDrive.driveForward(4.0, halfPower);
+        switch (park) {
+            case PARK_PATTERN_FRONTSTAGE:
+
+                //strafe left
+                autoDrive.setDrivePower(-oneThirdPower,quarterPower, oneThirdPower, -quarterPower);
+
+                sleep(300);
+
+                autoDrive.setDrivePower(0.0,0.0, 0.0, 0.0);
+
+                autoDrive.setDrivePower(oneThirdPower,quarterPower, oneThirdPower, quarterPower);
+
+                sleep(100);
+
+                autoDrive.setDrivePower(0.0,0.0, 0.0, 0.0);
+
+                break;
+
+            case PARK_PATTERN_BACKSTAGE:
+                    //strafe right
+                autoDrive.setDrivePower(oneThirdPower,-quarterPower, -oneThirdPower, quarterPower);
+
+                sleep(400);
+
+                autoDrive.setDrivePower(0.0,0.0, 0.0, 0.0);
+
+                autoDrive.setDrivePower(oneThirdPower,quarterPower, oneThirdPower, quarterPower);
+
+                sleep(50);
+
+                autoDrive.setDrivePower(0.0,0.0, 0.0, 0.0);
+
+                break;
+
+            case PARK_PATTERN_NOT_SELECTED:
+                // This one should not happen if it does do nothing
+                break;
+        }
+
+        autoDrive.setDrivePower(oneThirdPower,quarterPower, oneThirdPower, quarterPower);
+
+        sleep(500);
+
+        autoDrive.setDrivePower(0.0,0.0, 0.0, 0.0);
+
+        //autoDrive.driveForward(4.0, quarterPower);
 
         switch (park) {
             case PARK_PATTERN_FRONTSTAGE:
 
-                autoDrive.strafeRight(5.0, halfPower);
+                //autoDrive.strafeRight(5.0, halfPower);
 
                 break;
 
             case PARK_PATTERN_BACKSTAGE:
 
-                autoDrive.strafeLeft(5.0, halfPower);
+                //autoDrive.strafeLeft(5.0, halfPower);
 
                 break;
 

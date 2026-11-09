@@ -67,7 +67,8 @@ import java.util.List;
 @TeleOp(name = "TeleOpMain (Blocks to Java)", group = "Drive")
 public class TeleOpMain extends LinearOpMode {
 
-  FieldOrientatedDrive drive = new FieldOrientatedDrive();
+  //FieldOrientatedDrive drive = new FieldOrientatedDrive();
+  private TankDrive tankDrive = new TankDrive();
 
   private MotorsClass motors = new MotorsClass();
   // Create other motors
@@ -146,7 +147,7 @@ public class TeleOpMain extends LinearOpMode {
   @Override
   public void runOpMode() {
 
-    drive.init(hardwareMap);
+    tankDrive.init(hardwareMap);
     motors.init(hardwareMap);
 
 
@@ -228,17 +229,25 @@ public class TeleOpMain extends LinearOpMode {
       motors.handleFlyWheel(gamepad1);
       motors.pusherUpperMech(gamepad1);
       telemetry.update();
-      
+
+      double leftPower = -gamepad1.left_stick_y;
+      double rightPower = -gamepad1.right_stick_y;
+
+
+      tankDrive.tankDrive(leftPower, rightPower);
       //establish FieldOrientatedDrive controls from java class
-      double forward = -gamepad1.left_stick_y;
-      double strafe = gamepad1.left_stick_x;
-      double rotate = gamepad1.right_stick_x;
+      //double forward = -gamepad1.left_stick_y;
+      //double strafe = gamepad1.left_stick_x;
+      //double rotate = gamepad1.right_stick_x;
 
-      drive.driveFieldRelative(forward, strafe, rotate);
+      //drive.driveFieldRelative(forward, strafe, rotate);
 
-      telemetry.addData("IMU Heading (degrees)", "%.1f",
-              drive.getHeadingDegrees());
-      telemetry.update();
+      //telemetry.addData("IMU Heading (degrees)", "%.1f",
+        //      drive.getHeadingDegrees());
+
+      //telemetry.addData("Heading", drive.getHeadingDegrees());
+      //telemetry.update();
+      //telemetry.update();
 
       // Updates the button history
       

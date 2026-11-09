@@ -88,7 +88,7 @@ public class MotorsClass {
 
         // 3. Set the motor to full power (1.0) or off (0.0)
         if (motorRunning) {
-            flyWheelMotor.setPower(1.0); // 1.0 means 100% power
+            flyWheelMotor.setPower(0.95); // 1.0 means 100% power
         } else {
             flyWheelMotor.setPower(0.0);
         }
