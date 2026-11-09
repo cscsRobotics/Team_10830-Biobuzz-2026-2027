@@ -1,20 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
-
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 public class FieldOrientatedDrive {
 
-    GoBildaPinpointDriver pinpoint;
+    private PinpointOdometry odometry;
     private DcMotor frontLeftDrive;
     private DcMotor frontRightDrive;
     private DcMotor backLeftDrive;
@@ -22,25 +14,13 @@ public class FieldOrientatedDrive {
 
 
     public void init(HardwareMap hardwareMap) {
-        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
+
+        odometry = new PinpointOdometry(hardwareMap);
 
         frontLeftDrive = hardwareMap.get(DcMotor.class, "FLMoto");
         backLeftDrive = hardwareMap.get(DcMotor.class, "BLMoto");
         frontRightDrive = hardwareMap.get(DcMotor.class, "FRMoto");
         backRightDrive = hardwareMap.get(DcMotor.class, "BRMoto");
-
-        //odometry computer configuration
-        pinpoint.setOffsets(-185.0,-133.0, DistanceUnit.MM);
-        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
-
-        //odometry starting position
-        pinpoint.resetPosAndIMU();
-        Pose2D startingPosition = new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0);
-        //fix starting position for pinpoint for TeleOp and Autonomous modes to ensure accurate readings of the computer
-        pinpoint.setPosition(startingPosition);
-
-        pinpoint.update();
 
         frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -72,7 +52,7 @@ public class FieldOrientatedDrive {
         double frontRightPower = forward - strafe - rotate;
         double backRightPower = forward + strafe - rotate;
 
-        double maxPower = 1.0;
+        double maxPower = Math.max(1.0, Math.max(Math.abs(frontLeftPower), Math.max(Math.abs(backLeftPower), Math.max(Math.abs(frontRightPower), Math.abs(backRightPower)))));
         double maxSpeed = 1.0;
 
         maxPower = Math.max(maxPower, Math.abs(frontLeftPower));
@@ -88,24 +68,17 @@ public class FieldOrientatedDrive {
 
     public void driveFieldRelative(double forward, double strafe, double rotate) {
 
-        pinpoint.update();
+        odometry.update();
 
-        Pose2D pos = pinpoint.getPosition();
+        double botHeading = odometry.getHeading();
 
-        double botHeading = pos.getHeading(AngleUnit.RADIANS);
-
-        double rotX = strafe * Math.cos(-botHeading)
-                - forward * Math.sin(-botHeading);
-
-        double rotY = strafe * Math.sin(-botHeading)
-                + forward * Math.cos(-botHeading);
+        double rotX = strafe * Math.cos(botHeading) - forward * Math.sin(botHeading);
+        double rotY = strafe * Math.sin(botHeading) + forward * Math.cos(botHeading);
 
         drive(rotY, rotX, rotate);
     }
-    public double getHeadingDegrees() {
-        pinpoint.update();
-        Pose2D pos = pinpoint.getPosition();
-        return pos.getHeading(AngleUnit.DEGREES);
+    public PinpointOdometry getOdometry() {
+        return odometry;
     }
 
 }

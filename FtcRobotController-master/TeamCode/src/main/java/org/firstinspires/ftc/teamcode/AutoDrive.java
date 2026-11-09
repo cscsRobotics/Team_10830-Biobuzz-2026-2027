@@ -92,7 +92,6 @@ import android.os.Environment;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 public class AutoDrive {
 
-    GoBildaPinpointDriver pinpoint;
     private DcMotor frontLeftDrive;
     private DcMotor frontRightDrive;
     private DcMotor backLeftDrive;
@@ -107,14 +106,11 @@ public class AutoDrive {
     private static final double batteryConst = 13.5;
 
     private static final Double wheelCircumference = 4.09 * Math.PI;
-    private static final Double gearRatio = 18.9;                  // Rev HD Hex 20:1
+    private static final Double gearRatio = 20.0;                  // Rev HD Hex 20:1
     private static final Double countsPerRotation = 560.0;         // Rev HD Hex 20:1
-    //private static final Double scaleFactor = 1.0;                 // need to find scale factor!!!
-    //private static final Double strafeFactor = 1.0;
-    //private static final Double countsPerInch = countsPerRotation / wheelCircumference / gearRatio;
-
     private static final Double countsPerInch = (countsPerRotation * gearRatio) / wheelCircumference;
 
+    private PinpointOdometry odometry;
 
     public AutoDrive(LinearOpMode opMode) {
         this.opMode = opMode;
@@ -122,10 +118,10 @@ public class AutoDrive {
 
     public void init(HardwareMap hardwareMap) {
 
+        // PinpointOdometry handles the hardware map and configuration internally
+        odometry = new PinpointOdometry(hardwareMap);
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
-
-        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
 
         frontLeftDrive = hardwareMap.get(DcMotor.class, "FLMoto");
         backLeftDrive = hardwareMap.get(DcMotor.class, "BLMoto");
@@ -133,18 +129,6 @@ public class AutoDrive {
         backRightDrive = hardwareMap.get(DcMotor.class, "BRMoto");
 
         //odometry computer configuration
-        pinpoint.setOffsets(-185.0,-133.0, DistanceUnit.MM);
-        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
-        pinpoint.recalibrateIMU();
-
-        //odometry starting position
-        pinpoint.resetPosAndIMU();
-        Pose2D startingPosition = new Pose2D(DistanceUnit.MM, 0, 0, AngleUnit.DEGREES, 0);
-        //fix starting position for pinpoint for TeleOp and Autonomous modes to ensure accurate readings of the computer
-        pinpoint.setPosition(startingPosition);
-
-        pinpoint.update();
 
         frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -169,10 +153,8 @@ public class AutoDrive {
 
     }
 
-    public double getHeadingDegrees() {
-        pinpoint.update();
-        Pose2D pos = pinpoint.getPosition();
-        return pos.getHeading(AngleUnit.DEGREES);
+    public PinpointOdometry getOdometry() {
+        return odometry;
     }
 
     public void resetEncoders()
@@ -200,7 +182,7 @@ public class AutoDrive {
     }
 
     public double checkDirection() {
-        double currentHeading = getHeadingDegrees();
+        double currentHeading = odometry.getHeadingDegrees();
 
         double error = normalizeHeading(targetHeading - currentHeading);
 
@@ -208,26 +190,26 @@ public class AutoDrive {
 
         return error * Kp;
     }
-    /************************************************************/
+    //************************************************************//
     /* Function: strafeRight                                    */
     /* Returns: nothing                                         */
     /*                                                          */
     /* This function is called to have the robot move sideways  */
     /* in a right direction                                     */
-    /************************************************************/
+    //************************************************************//
     public void strafeRight(Double inches,Double power)
     {
         driveInches(inches, power, -power, -power, power);
 
     }
 
-    /************************************************************/
+    //************************************************************/
     /* Function: strafeLeft                                     */
     /* Returns: nothing                                         */
     /*                                                          */
     /* This function is called to have the robot move sideways  */
     /* in a left  direction                                     */
-    /************************************************************/
+    //************************************************************/
     public void strafeLeft(Double inches,Double power)
     {
         driveInches(inches, -power, power, power, -power);
@@ -286,7 +268,7 @@ public class AutoDrive {
             resetEncoders();
             runUsingEncoders();
 
-        targetHeading = getHeadingDegrees();
+        targetHeading = odometry.getHeadingDegrees();
 
             double voltage = voltageSensor.getVoltage();
 
@@ -309,7 +291,7 @@ public class AutoDrive {
             while (opMode.opModeIsActive()
                     && driveTimer.seconds() < timeoutSeconds) {
 
-                pinpoint.update();
+                odometry.update();
 
                 boolean FLdone =
                         Math.abs(frontLeftDrive.getCurrentPosition()) >= counts;
@@ -375,9 +357,9 @@ public class AutoDrive {
         backLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        pinpoint.update();
+        odometry.update();
 
-        double targetHeading = normalizeHeading(getHeadingDegrees() + degrees
+        double targetHeading = normalizeHeading(odometry.getHeadingDegrees() + degrees
         );
 
         ElapsedTime rotateTimer = new ElapsedTime();
@@ -386,10 +368,10 @@ public class AutoDrive {
         while (opMode.opModeIsActive()
                 && rotateTimer.seconds() < timeoutSeconds) {
 
-            pinpoint.update();
+            odometry.update();
 
             double currentHeading = normalizeHeading(
-                    getHeadingDegrees()
+                    odometry.getHeadingDegrees()
             );
 
             double error = normalizeHeading(
