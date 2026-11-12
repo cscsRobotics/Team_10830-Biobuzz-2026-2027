@@ -4,9 +4,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+
 public class FieldOrientatedDrive {
 
     private PinpointOdometry odometry;
+    private ControlHubIMU backupIMU;
     private DcMotor frontLeftDrive;
     private DcMotor frontRightDrive;
     private DcMotor backLeftDrive;
@@ -16,6 +19,11 @@ public class FieldOrientatedDrive {
     public void init(HardwareMap hardwareMap) {
 
         odometry = new PinpointOdometry(hardwareMap);
+        backupIMU = new ControlHubIMU(
+                hardwareMap,
+                RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
+                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
+        );
 
         frontLeftDrive = hardwareMap.get(DcMotor.class, "FLMoto");
         backLeftDrive = hardwareMap.get(DcMotor.class, "BLMoto");
@@ -52,8 +60,9 @@ public class FieldOrientatedDrive {
         double frontRightPower = forward - strafe - rotate;
         double backRightPower = forward + strafe - rotate;
 
-        double maxPower = Math.max(1.0, Math.max(Math.abs(frontLeftPower), Math.max(Math.abs(backLeftPower), Math.max(Math.abs(frontRightPower), Math.abs(backRightPower)))));
         double maxSpeed = 1.0;
+        double maxPower = Math.max(1.0, Math.max(Math.abs(frontLeftPower), Math.max(Math.abs(backLeftPower), Math.max(Math.abs(frontRightPower), Math.abs(backRightPower)))));
+
 
         maxPower = Math.max(maxPower, Math.abs(frontLeftPower));
         maxPower = Math.max(maxPower, Math.abs(backLeftPower));
@@ -72,13 +81,42 @@ public class FieldOrientatedDrive {
 
         double botHeading = odometry.getHeading();
 
-        double rotX = strafe * Math.cos(botHeading) - forward * Math.sin(botHeading);
-        double rotY = strafe * Math.sin(botHeading) + forward * Math.cos(botHeading);
+        double rotX = strafe * Math.cos(-botHeading) - forward * Math.sin(-botHeading);
+        double rotY = strafe * Math.sin(-botHeading) + forward * Math.cos(-botHeading);
 
         drive(rotY, rotX, rotate);
+    }
+
+    public double getSafeHeadingRadians() {
+        try {
+            odometry.update();
+            double headingDeg = odometry.getHeadingDegrees();
+
+            // If Pinpoint returns NaN (disconnected/glitched), use backup IMU
+            if (Double.isNaN(headingDeg)) {
+                return backupIMU.getHeadingRadians();
+            }
+            return odometry.getHeading(); // Returns radians
+        } catch (Exception e) {
+            // Fallback to Control Hub IMU on exception
+            return backupIMU.getHeadingRadians();
+        }
     }
     public PinpointOdometry getOdometry() {
         return odometry;
     }
 
+    public ControlHubIMU getBackupIMU() {
+        return backupIMU;
+    }
+
+    // Add this method inside FieldOrientatedDrive.java
+    public void resetHeading() {
+        try {
+            odometry.setPose(odometry.getXInches(), odometry.getYInches(), 0);
+        } catch (Exception e) {
+            // Ignore if Pinpoint is dead
+        }
+        backupIMU.resetYaw();
+    }
 }

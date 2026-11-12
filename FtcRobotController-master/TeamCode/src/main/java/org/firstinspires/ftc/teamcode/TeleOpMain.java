@@ -237,16 +237,28 @@ public class TeleOpMain extends LinearOpMode {
       double strafe = gamepad1.left_stick_x;
       double rotate = gamepad1.right_stick_x;
 
+      // Apply a deadzone of 0.05 (adjust as needed for your controller)
+      if (Math.abs(forward) < 0.05) forward = 0.0;
+      if (Math.abs(strafe) < 0.05) strafe = 0.0;
+      if (Math.abs(rotate) < 0.05) rotate = 0.0;
+
       drive.driveFieldRelative(forward, strafe, rotate);
 
 
       // Display Pinpoint Odometry telemetry
-      telemetry.addData("Heading (deg)", "%.1f", drive.getOdometry().getHeadingDegrees());
-      telemetry.addData("X Position (in)", "%.1f", drive.getOdometry().getXInches());
-      telemetry.addData("Y Position (in)", "%.1f", drive.getOdometry().getYInches());
-      telemetry.update();
-      telemetry.update();
+      if (gamepad1.back) {
+        drive.resetHeading();
+      }
 
+      // --- ADDED: Enhanced Telemetry for Drivers ---
+      double currentHeading = drive.getSafeHeadingRadians(); // Gets heading with automatic fallback
+      telemetry.addData("Heading (Deg)", "%.1f", Math.toDegrees(currentHeading));
+
+      // Optional: Check if Pinpoint is healthy or if it's running on backup
+      boolean pinpointHealthy = !Double.isNaN(drive.getOdometry().getHeadingDegrees());
+      telemetry.addData("Odometry Source", pinpointHealthy ? "Pinpoint (Primary)" : "Control Hub IMU (Backup!)");
+
+      telemetry.update();
       // Updates the button history
       
         /* NormalizedRGBA ballColor = color.getNormalizedColors();
