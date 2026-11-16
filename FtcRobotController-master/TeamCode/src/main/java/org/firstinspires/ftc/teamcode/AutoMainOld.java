@@ -156,7 +156,7 @@ public class AutoMainOld extends LinearOpMode {
     /* Variables for driving with Encoders */
     /***************************************/
     private static final Double wheelCircumference = 4.0 * Math.PI;
-    private static final Double gearRatio = 18.9;                  // Rev HD Hex 20:1
+    private static final Double gearRatio = 20.0;                  // Rev HD Hex 20:1
     private static final Double countsPerRotation = 560.0;         // Rev HD Hex 20:1
     private static final Double scaleFactor = 17.0;                 // need to find scale factor!!!
     private static final Double strafeFactor = 1.0;
@@ -478,34 +478,39 @@ public class AutoMainOld extends LinearOpMode {
         switch (park) {
             case PARK_PATTERN_FRONTSTAGE:
 
+                autoDrive.driveForward(15.0, halfPower);
+
+                sleep(3000);
+
+
                 //strafe left
-                autoDrive.setDrivePower(-oneThirdPower,quarterPower, oneThirdPower, -quarterPower);
+                //autoDrive.setDrivePower(-oneThirdPower,quarterPower, oneThirdPower, -quarterPower);
 
-                sleep(300);
+                //autoDrive.setDrivePower(0.0,0.0, 0.0, 0.0);
 
-                autoDrive.setDrivePower(0.0,0.0, 0.0, 0.0);
+                //autoDrive.setDrivePower(oneThirdPower,quarterPower, oneThirdPower, quarterPower);
 
-                autoDrive.setDrivePower(oneThirdPower,quarterPower, oneThirdPower, quarterPower);
+                //sleep(100);
 
-                sleep(100);
+                //autoDrive.setDrivePower(0.0,0.0, 0.0, 0.0);
 
-                autoDrive.setDrivePower(0.0,0.0, 0.0, 0.0);
+
 
                 break;
 
             case PARK_PATTERN_BACKSTAGE:
                     //strafe right
-                autoDrive.setDrivePower(oneThirdPower,-quarterPower, -oneThirdPower, quarterPower);
+                //autoDrive.setDrivePower(oneThirdPower,-quarterPower, -oneThirdPower, quarterPower);
 
-                sleep(400);
+                //sleep(400);
 
-                autoDrive.setDrivePower(0.0,0.0, 0.0, 0.0);
+                //.setDrivePower(0.0,0.0, 0.0, 0.0);
 
-                autoDrive.setDrivePower(oneThirdPower,quarterPower, oneThirdPower, quarterPower);
+                //autoDrive.setDrivePower(oneThirdPower,quarterPower, oneThirdPower, quarterPower);
 
                 sleep(50);
 
-                autoDrive.setDrivePower(0.0,0.0, 0.0, 0.0);
+                //autoDrive.setDrivePower(0.0,0.0, 0.0, 0.0);
 
                 break;
 
@@ -514,11 +519,11 @@ public class AutoMainOld extends LinearOpMode {
                 break;
         }
 
-        autoDrive.setDrivePower(oneThirdPower,quarterPower, oneThirdPower, quarterPower);
+        //autoDrive.setDrivePower(oneThirdPower,quarterPower, oneThirdPower, quarterPower);
 
-        sleep(500);
+        //sleep(500);
 
-        autoDrive.setDrivePower(0.0,0.0, 0.0, 0.0);
+        //autoDrive.setDrivePower(0.0,0.0, 0.0, 0.0);
 
         //autoDrive.driveForward(4.0, quarterPower);
 

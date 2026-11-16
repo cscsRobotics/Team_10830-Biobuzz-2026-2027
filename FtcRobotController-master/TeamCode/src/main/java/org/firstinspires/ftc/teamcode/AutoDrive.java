@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -64,24 +63,6 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 //
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
-// Driving with Gyro (IMU) classes
-//
-// import for IMU (gyroscope)
-import org.firstinspires.ftc.robotcore.external.Func;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
-import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 
 // Not sure if needed.
 //
@@ -107,8 +88,12 @@ public class AutoDrive {
 
     private static final Double wheelCircumference = 4.09 * Math.PI;
     private static final Double gearRatio = 20.0;                  // Rev HD Hex 20:1
-    private static final Double countsPerRotation = 560.0;         // Rev HD Hex 20:1
-    private static final Double countsPerInch = (countsPerRotation * gearRatio) / wheelCircumference;
+    private static final Double countsPerRevolution = 560.0;         // Rev HD Hex 20:1
+
+    private static final Double scaleFactor = 25.46;
+
+    private static final Double countsPerInch = countsPerRevolution / wheelCircumference;
+    //private static final Double countsPerInch = ((countsPerRotation * gearRatio) / wheelCircumference) / scaleFactor;
 
     private PinpointOdometry odometry;
 
@@ -226,6 +211,7 @@ public class AutoDrive {
     public void driveForward(Double inches,Double power)
     {
         driveInches(inches, power, power, power, power);
+
     }
 
     /***************************************************************/
@@ -263,7 +249,8 @@ public class AutoDrive {
     /************************************************************/
     public void driveInches(Double inches,Double FLpower,Double FRpower, Double BLpower, Double BRpower) {
 
-            double counts = Math.abs(inches * countsPerInch);
+        odometry.update();
+        double counts = Math.abs(inches * countsPerInch);
 
             resetEncoders();
             runUsingEncoders();
@@ -273,56 +260,47 @@ public class AutoDrive {
             double voltage = voltageSensor.getVoltage();
 
             // Prevent division by zero or invalid voltage readings.
-            if (voltage <= 0) {
-                setDrivePower(0.0, 0.0, 0.0, 0.0);
-                return;
-            }
-
         FLpower = ((batteryConst*FLpower)/voltage);
         FRpower = ((batteryConst*FRpower)/voltage);
         BLpower = ((batteryConst*BLpower)/voltage);
         BRpower = ((batteryConst*BRpower)/voltage);
 
-            ElapsedTime driveTimer = new ElapsedTime();
+        setDrivePower(FLpower, FRpower, BLpower, BRpower);
 
-            // Safety timeout: stop if the requested movement takes too long.
-            double timeoutSeconds = 5.0 + Math.abs(inches) / 5.0;
 
-            while (opMode.opModeIsActive()
-                    && driveTimer.seconds() < timeoutSeconds) {
+        while (opMode.opModeIsActive() &&
+                ((Math.abs(frontLeftDrive.getCurrentPosition()) +
+                        Math.abs(frontRightDrive.getCurrentPosition())) / 2.0)
+                        < Math.abs(counts)) {
 
-                odometry.update();
+            double correction = checkDirection();
 
-                boolean FLdone =
-                        Math.abs(frontLeftDrive.getCurrentPosition()) >= counts;
+            setDrivePower(FLpower - correction, FRpower + correction, BLpower - correction,BRpower + correction
+            );
 
-                boolean FRdone =
-                        Math.abs(frontRightDrive.getCurrentPosition()) >= counts;
+            opMode.idle();
+        }
 
-                boolean BLdone =
-                        Math.abs(backLeftDrive.getCurrentPosition()) >= counts;
+// Stop motors only AFTER reaching the target.
+        setDrivePower(0.0, 0.0, 0.0, 0.0);
 
-                boolean BRdone =
-                        Math.abs(backRightDrive.getCurrentPosition()) >= counts;
+// Read final encoder positions.
+        opMode.telemetry.addData("FL Encoder",
+                frontLeftDrive.getCurrentPosition());
+        opMode.telemetry.addData("FR Encoder",
+                frontRightDrive.getCurrentPosition());
+        opMode.telemetry.addData("BL Encoder",
+                backLeftDrive.getCurrentPosition());
+        opMode.telemetry.addData("BR Encoder",
+                backRightDrive.getCurrentPosition());
+        opMode.telemetry.addData("Target Ticks", counts);
+        opMode.telemetry.addData("Estimated Inches", getInchesDriven());
+        opMode.telemetry.update();
 
-                // Finish once every wheel reaches its target.
-                if (FLdone && FRdone && BLdone && BRdone) {
-                    break;
-                }
-
-                double correction = checkDirection();
-
-                setDrivePower(FLpower-correction, FRpower+correction, BLpower-correction, BRpower+correction);
-
-                opMode.idle();
-            }
+            // Stop all motors
 
             // Always stop the drive motors when the loop ends.
-            setDrivePower(0.0, 0.0, 0.0, 0.0);
-
-            runUsingEncoders(); // Stop all motors
-
-
+        setDrivePower(0.0,0.0,0.0,0.0);
 
         }
 
@@ -368,7 +346,6 @@ public class AutoDrive {
         while (opMode.opModeIsActive()
                 && rotateTimer.seconds() < timeoutSeconds) {
 
-            odometry.update();
 
             double currentHeading = normalizeHeading(
                     odometry.getHeadingDegrees()
@@ -405,6 +382,19 @@ public class AutoDrive {
 
         opMode.sleep(250);
     }
+
+    public double getInchesDriven() {
+
+        double fl = frontLeftDrive.getCurrentPosition();
+        double fr = frontRightDrive.getCurrentPosition();
+
+        double averageTicks =
+                (Math.abs(fl) +
+                Math.abs(fr)) / 2.0;
+
+        return averageTicks / countsPerInch;
+    }
+
 
 }
 
